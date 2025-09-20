@@ -182,8 +182,8 @@ jobs:
           VERSION="${{ needs.version-check.outputs.version }}"
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git tag -a "v${VERSION}" -m "Release v${VERSION}"
-          git push origin "v${VERSION}"
+          git tag -a "${VERSION}" -m "Release ${VERSION}"
+          git push origin "${VERSION}"
       
       - name: Create GitHub Release
         env:
@@ -191,20 +191,12 @@ jobs:
         run: |
           VERSION="${{ needs.version-check.outputs.version }}"
           PACKAGE_NAME="${{ needs.version-check.outputs.package_name }}"
-          NPM_VERSION="${{ needs.version-check.outputs.npm_version }}"
-          
-          # Create release notes
-          if [ "$NPM_VERSION" = "not-found" ]; then
-            COMPARE_TEXT="Initial release"
-          else
-            COMPARE_TEXT="[Changelog](https://github.com/${{ github.repository }}/compare/v${NPM_VERSION}...v${VERSION})"
-          fi
           
           # Create release using GitHub CLI with heredoc
-          gh release create "v${VERSION}" \
-            --title "v${VERSION}" \
+          gh release create "${VERSION}" \
+            --title "${VERSION}" \
             --notes "$(cat <<EOF
-          ## 🚀 Release v${VERSION}
+          ## 🚀 Release ${VERSION}
           
           ### 📦 Installation
           \`\`\`bash
@@ -220,8 +212,7 @@ jobs:
           
           ### 🔗 Links
           - [NPM Package](https://www.npmjs.com/package/${PACKAGE_NAME}/v/${VERSION})
-          - [Documentation](https://github.com/${{ github.repository }}/blob/v${VERSION}/README.md)
-          - ${COMPARE_TEXT}
+          - [Documentation](https://github.com/${{ github.repository }}/blob/${VERSION}/README.md)
           
           ---
           *Published automatically by GitHub Actions*
