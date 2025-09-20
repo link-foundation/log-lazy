@@ -729,7 +729,7 @@ xychart-beta
     title "Production Performance: Mixed Workload at Warn Level (lower is better)"
     x-axis ["Traditional Logging", "Lazy Logging"]
     y-axis "Time (milliseconds)" 0.01 --> 100
-    bar [19.04, 0.08] "Execution time"
+    bar [19.04, 0.08]
 ```
 
 **Key Results:**
