@@ -7,7 +7,10 @@
   "scripts": {
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "test:coverage": "bun test --coverage"
+    "test:coverage": "bun test --coverage",
+    "bench": "bun run benchmarks/lazy-vs-traditional.bench.js && bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
+    "bench:lazy": "bun run benchmarks/lazy-vs-traditional.bench.js",
+    "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js"
   },
   "keywords": [
     "logging",
@@ -20,11 +23,12 @@
   "license": "Unlicense",
   "devDependencies": {
     "@types/bun": "^1.1.13",
+    "bunyan": "^1.8.15",
     "debug": "^4.3.4",
-    "winston": "^3.11.0",
     "log4js": "^6.9.1",
+    "mitata": "^1.0.34",
     "pino": "^8.16.2",
-    "bunyan": "^1.8.15"
+    "winston": "^3.11.0"
   },
   "engines": {
     "bun": ">=1.0.0"
