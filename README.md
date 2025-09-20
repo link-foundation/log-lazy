@@ -33,16 +33,24 @@ logger.debug(`User data: ${JSON.stringify(user)}, Posts: ${JSON.stringify(posts)
 
 // This ALWAYS performs the calculation, even when logging is disabled!
 logger.debug(`Found ${users.filter(u => u.active).length} active users`);
+
+// This ALWAYS builds the entire string, even when not logging!
+logger.info(`Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
 ```
 
 ### ✅ Lazy Logging (Only Evaluates When Needed)
 ```javascript
-// JSON.stringify only runs if debug logging is enabled!
-logger.debug('User data:', () => JSON.stringify(user), 'Posts:', () => JSON.stringify(posts));
+// Just add () => to make it lazy! JSON.stringify only runs if debug is enabled
+logger.debug(() => `User data: ${JSON.stringify(user)}, Posts: ${JSON.stringify(posts)}`);
 
 // Calculation only happens if debug logging is enabled!
-logger.debug('Found', () => users.filter(u => u.active).length, 'active users');
+logger.debug(() => `Found ${users.filter(u => u.active).length} active users`);
+
+// Complex string building only happens when info is enabled!
+logger.info(() => `Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
 ```
+
+The beauty is in the simplicity - just wrap your existing template literals with `() =>` and you get lazy evaluation!
 
 ## 🔥 Performance Benefits
 
@@ -51,33 +59,25 @@ With lazy evaluation, you can keep detailed logging in production:
 ```javascript
 import { LazyLog } from 'log-lazy';
 
-const log = new LazyLog({ level: 'error' }); // Only errors in production
+const logger = new LazyLog({ level: 'error' }); // Only errors in production
+const log = logger.log; // Use the shorter log() syntax
 
 function processOrder(order) {
   // These debug logs have ZERO performance impact in production!
-  log.debug('Processing order', () => JSON.stringify(order));
-  log.debug('Validation details', () => {
-    // Complex validation logic that only runs in development
-    return performExpensiveValidation(order);
-  });
+  // Just wrap template literals with () =>
+  log.debug(() => `Processing order ${JSON.stringify(order)}`);
+  log.debug(() => `Validation details: ${performExpensiveValidation(order)}`);
   
   try {
     const result = submitOrder(order);
     
     // This also has zero cost when info is disabled
-    log.info('Order submitted', () => ({
-      orderId: result.id,
-      items: result.items.map(i => i.serialize()),
-      total: result.calculateTotal()
-    }));
+    log.info(() => `Order #${result.id} submitted with ${result.items.length} items, total: $${result.calculateTotal()}`);
     
     return result;
   } catch (error) {
     // Error logging is enabled, so this will execute
-    log.error('Order failed', error, () => ({
-      orderId: order.id,
-      snapshot: JSON.stringify(order)
-    }));
+    log.error(() => `Order ${order.id} failed: ${error.message}. Snapshot: ${JSON.stringify(order)}`);
     throw error;
   }
 }
@@ -120,46 +120,44 @@ const devLog = new LazyLog({ level: 'development' });  // fatal, error, warn, in
 ```javascript
 import { LazyLog } from 'log-lazy';
 
-// Create logger instance
-const logger = new LazyLog({
-  level: 'info',  // Can be: string name, number, or numeric string
-  log: {          // Optional: Override output functions
-    error: customErrorHandler,
-    info: customInfoHandler
-  }
-});
+// Create logger and get the log function for shorter syntax
+const logger = new LazyLog({ level: 'info' });
+const log = logger.log;
 
-// Use it
-logger.info('Server started on port', 3000);
-logger.error('Failed to connect:', () => getDetailedError());
+// Simple usage - just wrap template literals with () =>
+log.info(() => `Server started on port ${port}`);
+log.error(() => `Failed to connect: ${error.message}`);
+
+// Or use the traditional logger methods
+logger.info(() => `Server started on port ${port}`);
+logger.error(() => `Failed to connect: ${error.message}`);
 ```
 
 ### Lazy Evaluation Examples
 
 ```javascript
-// Expensive serialization - only runs if debug is enabled
-logger.debug('State snapshot:', () => JSON.stringify(largeStateObject));
+const logger = new LazyLog({ level: process.env.LOG_LEVEL || 'info' });
+const log = logger.log;
 
-// Multiple lazy arguments
-logger.info(
-  'Stats:',
-  () => calculateActiveUsers(),
-  'active users,',
-  () => calculateRevenue(),
-  'revenue'
-);
+// Simple: Just add () => before your template literals!
+log.debug(() => `State snapshot: ${JSON.stringify(largeStateObject)}`);
 
-// Lazy error details
-logger.error('Operation failed', error, () => ({
-  context: gatherContext(),
-  state: captureState(),
-  metrics: calculateMetrics()
-}));
+// Works with any expensive operation in template literals
+log.info(() => `Stats: ${calculateActiveUsers()} active users, revenue: $${calculateRevenue()}`);
 
-// Even works with complex computations
-logger.trace('Analysis:', () => {
+// Combine static and dynamic parts
+log.error(() => `Operation failed: ${error.message}
+  Context: ${JSON.stringify(gatherContext())}
+  State: ${JSON.stringify(captureState())}
+  Metrics: ${JSON.stringify(calculateMetrics())}`);
+
+// Multi-line template literals work great too
+log.trace(() => {
   const result = performExpensiveAnalysis();
-  return `Found ${result.anomalies} anomalies in ${result.duration}ms`;
+  return `Analysis complete:
+    Anomalies: ${result.anomalies}
+    Duration: ${result.duration}ms
+    Memory used: ${result.memoryUsed}MB`;
 });
 ```
 
@@ -215,32 +213,37 @@ if (process.env.NODE_ENV === 'production') {
 
 ## 🏆 Best Practices
 
-### 1. Always Use Functions for Expensive Operations
+### 1. The Simple Rule: Just Add `() =>`
 
 ```javascript
 // ❌ Bad - Always evaluates
 logger.debug(`Data: ${JSON.stringify(data)}`);
+logger.info(`Found ${items.length} items worth $${calculateTotal(items)}`);
 
-// ✅ Good - Only evaluates when needed
-logger.debug('Data:', () => JSON.stringify(data));
+// ✅ Good - Just add () => for lazy evaluation!
+logger.debug(() => `Data: ${JSON.stringify(data)}`);
+logger.info(() => `Found ${items.length} items worth $${calculateTotal(items)}`);
 ```
 
 ### 2. Keep Logging Statements in Production
 
 ```javascript
+const logger = new LazyLog({ level: process.env.LOG_LEVEL || 'error' });
+const log = logger.log;
+
 // You can now safely leave these in production code!
 function processPayment(payment) {
-  logger.debug('Processing payment', () => payment.serialize());
-  logger.trace('Validation rules:', () => gatherValidationRules());
+  // These won't execute in production (when level is 'error')
+  log.debug(() => `Processing payment: ${JSON.stringify(payment)}`);
+  log.trace(() => `Validation rules: ${JSON.stringify(gatherValidationRules())}`);
   
   // Business logic...
   
-  logger.info('Payment processed', () => ({
-    id: payment.id,
-    amount: payment.amount,
-    // This calculation only happens if info is enabled
-    fees: () => calculateFees(payment)
-  }));
+  log.info(() => `Payment ${payment.id} processed: $${payment.amount}, fees: $${calculateFees(payment)}`);
+  
+  if (payment.amount > 10000) {
+    log.warn(() => `Large payment detected: ${payment.id} for $${payment.amount}`);
+  }
 }
 ```
 
@@ -283,45 +286,38 @@ class OrderService {
     this.logger = new LazyLog({ 
       level: process.env.LOG_LEVEL || 'info' 
     });
+    this.log = this.logger.log; // Shorter syntax
   }
 
   async createOrder(orderData) {
-    // These debug logs have ZERO cost in production
-    this.logger.debug('Creating order', () => ({
-      items: orderData.items.length,
-      total: orderData.calculateTotal(),
-      customer: orderData.customerId
-    }));
+    // These debug logs have ZERO cost in production - just wrapped with () =>
+    this.log.debug(() => `Creating order with ${orderData.items.length} items, total: $${orderData.calculateTotal()}, customer: ${orderData.customerId}`);
 
     try {
       // Validate
-      this.logger.trace('Validating...', () => this.getValidationRules());
+      this.log.trace(() => `Validating with rules: ${JSON.stringify(this.getValidationRules())}`);
       const validation = await this.validate(orderData);
       
       // Process payment
-      this.logger.debug('Processing payment...', () => ({
-        method: orderData.paymentMethod,
-        amount: orderData.total
-      }));
+      this.log.debug(() => `Processing ${orderData.paymentMethod} payment for $${orderData.total}`);
       const payment = await this.processPayment(orderData);
       
       // Create order
       const order = await this.saveOrder(orderData, payment);
       
-      this.logger.info('Order created successfully', order.id);
+      this.log.info(() => `Order ${order.id} created successfully`);
       
       // This expensive operation only runs if verbose is enabled
-      this.logger.verbose('Order details:', () => order.toDetailedJSON());
+      this.log.verbose(() => `Order details: ${JSON.stringify(order.toDetailedJSON())}`);
       
       return order;
       
     } catch (error) {
-      // Error logging includes lazy evaluation for context
-      this.logger.error('Order creation failed', error, () => ({
-        orderData: JSON.stringify(orderData),
-        validationState: validation,
-        timestamp: new Date().toISOString()
-      }));
+      // Error logging with context - still lazy!
+      this.log.error(() => `Order creation failed: ${error.message}
+        Order data: ${JSON.stringify(orderData)}
+        Validation state: ${JSON.stringify(validation)}
+        Timestamp: ${new Date().toISOString()}`);
       throw error;
     }
   }
@@ -647,24 +643,28 @@ logger.debug(() => {
 ## 🚦 Performance Comparison
 
 ```javascript
-// Traditional logging
+// Traditional logging - string always built
 console.time('traditional');
 for(let i = 0; i < 1000000; i++) {
-  // This always builds the string, even when not logging!
+  // This ALWAYS builds the string, even when not logging!
+  const message = `Iteration ${i}: ${JSON.stringify({data: i, timestamp: Date.now()})}`;
   if(logLevel >= DEBUG) {
-    console.log(`Iteration ${i}: ${JSON.stringify({data: i})}`);
+    console.log(message);
   }
 }
-console.timeEnd('traditional'); // ~500ms even when not logging
+console.timeEnd('traditional'); // ~500ms even when not logging!
 
-// Lazy logging
+// Lazy logging with log-lazy
 console.time('lazy');
 const logger = new LazyLog({ level: 'error' }); // Debug disabled
+const log = logger.log;
 for(let i = 0; i < 1000000; i++) {
-  // Function never executes since debug is disabled!
-  logger.debug('Iteration', i, () => JSON.stringify({data: i}));
+  // Just add () => and the function never executes since debug is disabled!
+  log.debug(() => `Iteration ${i}: ${JSON.stringify({data: i, timestamp: Date.now()})}`);
 }
 console.timeEnd('lazy'); // ~5ms - near zero cost!
+
+// The difference: 100x faster when logs are disabled!
 ```
 
 ## 📊 Benchmarks
