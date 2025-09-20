@@ -715,11 +715,41 @@ console.timeEnd('lazy'); // ~5ms - near zero cost!
 Real benchmark results from [benchmarks/README.md](benchmarks/README.md):
 
 ### Lazy vs Traditional (with logging disabled):
+
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      backgroundColor: "transparent"
+---
+xychart horizontal
+    title "Performance Comparison: Lazy vs Traditional (lower is better)"
+    x-axis "Time (microseconds - log scale)"
+    y-axis ["JSON.stringify", "Calculations", "String concat"]
+    bar [1880000, 409.41, 188950000] "Traditional"
+    bar [2.40, 36.64, 170.34] "Lazy"
+```
 - **JSON.stringify**: 783x faster (1.88ms → 2.40µs)
 - **Array calculations**: 11x faster (409µs → 37µs)  
 - **String concatenation**: 1,109x faster (189ms → 170µs)
 
 ### Lazy vs No Logs (production overhead):
+
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      backgroundColor: "transparent"
+---
+xychart horizontal
+    title "Production Overhead: No Logs vs Lazy Logs"
+    x-axis "Time (microseconds)"
+    y-axis ["Simple ops", "Complex ops", "Tight loops"]
+    bar [17.15, 617.28, 60.88] "No Logs"
+    bar [79.94, 895.81, 4910] "Lazy (disabled)"
+```
 - **Simple operations**: ~4.7x overhead (17µs → 80µs)
 - **Complex operations**: ~1.5x overhead (617µs → 896µs)
 - **Tight loops**: ~80x overhead (avoid logging here)

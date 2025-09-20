@@ -152,7 +152,7 @@ bench('No logs - tight loop (100k iterations)', () => {
     sum += i * 2;
     if (i % 1000 === 0) {
       // Some work every 1000 iterations
-      const temp = Math.sqrt(sum);
+      Math.sqrt(sum);
     }
   }
   return sum;

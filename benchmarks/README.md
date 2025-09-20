@@ -6,6 +6,21 @@ Lazy logging provides **100-1000x faster performance** when logs are disabled, w
 
 ## Lazy vs Traditional Logging
 
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      backgroundColor: "transparent"
+---
+xychart horizontal
+    title "Lazy vs Traditional Logging Performance (log scale)"
+    x-axis "Time (microseconds - log scale)"
+    y-axis ["JSON.stringify", "Calculations", "String concat", "When enabled"]
+    bar [1880000, 409.41, 188950000, 0.796] "Traditional"
+    bar [2.40, 36.64, 170.34, 42.53] "Lazy"
+```
+
 ### JSON.stringify with Disabled Logs
 - **Traditional**: 1.88 ms/iteration (always evaluates)
 - **Lazy**: 2.40 µs/iteration (skips evaluation)
@@ -29,6 +44,21 @@ Lazy logging provides **100-1000x faster performance** when logs are disabled, w
 ## No Logs vs Lazy Logs (Production Mode)
 
 This benchmark shows the cost of keeping lazy logs in production vs removing them entirely:
+
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      backgroundColor: "transparent"
+---
+xychart horizontal
+    title "No Logs vs Lazy Logs (Production Mode)"
+    x-axis "Time (microseconds)"
+    y-axis ["Simple Order", "Complex Data", "Tight Loop"]
+    bar [17.15, 617.28, 60.88] "No Logs"
+    bar [79.94, 895.81, 4910] "Lazy (disabled)"
+```
 
 ### Simple Order Processing (1000 iterations)
 - **No logs**: 17.15 µs
