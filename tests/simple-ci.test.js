@@ -1,24 +1,10 @@
 // Simplest possible test to check CI
 console.log('simple-ci.test.js: Starting');
 
-const isBun = typeof Bun !== 'undefined';
-console.log('simple-ci.test.js: isBun =', isBun);
-
-// Try to import without await at top level
-let testModule;
-try {
-  if (isBun) {
-    console.log('simple-ci.test.js: Attempting to import bun:test');
-    testModule = await import('bun:test');
-    console.log('simple-ci.test.js: Import successful');
-  } else {
-    console.log('simple-ci.test.js: Attempting to import test-setup.js');
-    testModule = await import('./test-setup.js');
-  }
-} catch (error) {
-  console.error('simple-ci.test.js: Import failed:', error);
-  throw error;
-}
+import { getTestModule } from './test-import-helper.js';
+console.log('simple-ci.test.js: Attempting to get test module');
+const testModule = await getTestModule();
+console.log('simple-ci.test.js: Test module loaded');
 
 const { describe, test, expect } = testModule;
 

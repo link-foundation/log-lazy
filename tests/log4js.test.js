@@ -1,10 +1,7 @@
 // Use Bun's test framework when available, fallback to cross-runtime setup
-const isBun = typeof Bun !== 'undefined';
-const testModule = isBun 
-  ? await import('bun:test')
-  : await import('./test-setup.js');
-
-const { describe, test, expect, mock } = testModule;
+import { getTestModule } from './test-import-helper.js';
+const testModule = await getTestModule();
+const { describe, test, expect, mock, beforeEach, spyOn } = testModule;
 import makeLog from '../src/index.js';
 
 describe('Log4js Integration', () => {

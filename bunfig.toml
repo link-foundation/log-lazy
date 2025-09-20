@@ -1,0 +1,8 @@
+# Bun configuration file
+
+[test]
+# Explicitly set test file patterns
+root = "./tests"
+
+# Ensure tests run in the correct environment  
+smol = false

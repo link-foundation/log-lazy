@@ -6,13 +6,9 @@ import makeLog from '../src/index.js';
 
 console.log('[reorder-import] makeLog imported');
 
-// Now do the conditional import
-const isBun = typeof Bun !== 'undefined';
-console.log('[reorder-import] isBun:', isBun);
-
-const testModule = isBun 
-  ? await import('bun:test')
-  : await import('./test-setup.js');
+// Now do the conditional import using helper
+import { getTestModule } from './test-import-helper.js';
+const testModule = await getTestModule();
 
 console.log('[reorder-import] testModule imported');
 

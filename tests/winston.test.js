@@ -1,20 +1,7 @@
 // Use Bun's test framework when available, fallback to cross-runtime setup
-const isBun = typeof Bun !== 'undefined';
-
-let testModule;
-try {
-  testModule = isBun 
-    ? await import('bun:test')
-    : await import('./test-setup.js');
-} catch (error) {
-  console.error('winston.test.js: Failed to import test module');
-  console.error('  - isBun:', isBun);
-  console.error('  - Error:', error.message);
-  console.error('  - Stack:', error.stack);
-  throw error;
-}
-
-const { describe, test, expect, beforeEach, mock } = testModule;
+import { getTestModule } from './test-import-helper.js';
+const testModule = await getTestModule();
+const { describe, test, expect, mock, beforeEach, spyOn } = testModule;
 import makeLog from '../src/index.js';
 import winston from 'winston';
 import Transport from 'winston-transport';

@@ -1,4 +1,7 @@
-import { describe, test, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test';
+// Use Bun's test framework when available, fallback to cross-runtime setup
+import { getTestModule } from './test-import-helper.js';
+const testModule = await getTestModule();
+const { describe, test, expect, beforeEach, afterEach, mock, spyOn } = testModule;
 import makeLog from '../src/index.js';
 
 describe('Template Literal Lazy Evaluation', () => {
