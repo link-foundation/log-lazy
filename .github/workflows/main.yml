@@ -111,16 +111,19 @@ jobs:
           for file in tests/{bunyan,debug,log4js,pino,winston,simple-ci,fix-attempt,reorder-import}.test.js; do
             if [ -f "$file" ]; then
               name=$(basename "$file")
-              echo -n "Testing $name... "
-              if timeout 5 node "$file" 2>&1 | grep -q "0 failed"; then
-                echo "✓"
+              echo "Testing $name..."
+              output=$(node "$file" 2>&1 || true)
+              if echo "$output" | grep -q "0 failed" && echo "$output" | grep -q "passed"; then
+                echo "  ✓ Test passed"
                 passed=$((passed + 1))
               else
-                echo "✗"
+                echo "  ✗ Test failed"
+                echo "$output" | tail -5
                 failed=$((failed + 1))
               fi
             fi
           done
+          echo ""
           echo "Node.js tests: $passed passed, $failed failed"
           if [ $failed -ne 0 ]; then
             exit 1
@@ -136,16 +139,19 @@ jobs:
           for file in tests/{debug,log4js,simple-ci,fix-attempt,reorder-import}.test.js; do
             if [ -f "$file" ]; then
               name=$(basename "$file")
-              echo -n "Testing $name... "
-              if deno test --allow-read "$file" 2>&1 | grep -q "0 failed"; then
-                echo "✓"
+              echo "Testing $name..."
+              output=$(deno test --allow-read "$file" 2>&1 || true)
+              if echo "$output" | grep -q "0 failed" && echo "$output" | grep -q "passed"; then
+                echo "  ✓ Test passed"
                 passed=$((passed + 1))
               else
-                echo "✗"
+                echo "  ✗ Test failed"
+                echo "$output" | tail -5
                 failed=$((failed + 1))
               fi
             fi
           done
+          echo ""
           echo "Deno tests: $passed passed, $failed failed"
           if [ $failed -ne 0 ]; then
             exit 1
