@@ -6,3 +6,6 @@ root = "./tests"
 
 # Ensure tests run in the correct environment  
 smol = false
+
+# Exclude TypeScript definition tests
+exclude = ["**/*.test.ts"]

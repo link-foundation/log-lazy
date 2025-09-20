@@ -164,7 +164,12 @@ jobs:
       # Non-Bun runtimes import from test-setup.js
       - name: Run tests with coverage
         if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
-        run: bun test --coverage
+        run: |
+          echo "Running tests with coverage..."
+          bun test --coverage 2>&1 | tee coverage.txt
+          echo ""
+          echo "Coverage Summary:"
+          tail -5 coverage.txt
       
       - name: Upload coverage reports
         if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
@@ -223,10 +228,10 @@ jobs:
           echo "Running ESLint..."
           bun run lint
       
-      - name: Type check
+      - name: Test TypeScript definitions
         run: |
-          echo "Running type checks..."
-          bun run --bun tsc --noEmit || true
+          echo "Testing TypeScript definitions..."
+          bun run test:types
 
   publish:
     needs: [test, benchmark, lint-and-typecheck, version-check]

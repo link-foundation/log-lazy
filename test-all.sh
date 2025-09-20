@@ -77,16 +77,34 @@ else
     DENO_EXIT=0
 fi
 
+# TypeScript definitions test
+echo "--- TYPESCRIPT DEFINITIONS ---"
+if command -v tsc &> /dev/null; then
+    echo "Testing TypeScript definitions..."
+    if bun run test:types &> /dev/null; then
+        echo "✓ TypeScript definitions valid"
+        TS_EXIT=0
+    else
+        echo "✗ TypeScript definitions failed"
+        TS_EXIT=1
+    fi
+    echo
+else
+    echo "TypeScript not installed, skipping..."
+    TS_EXIT=0
+fi
+
 # Summary
 echo "==========================="
 echo "SUMMARY"
 echo "==========================="
-echo "Bun:    $([ $BUN_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
-echo "Node:   $([ $NODE_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
-echo "Deno:   $([ $DENO_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
+echo "Bun:        $([ $BUN_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
+echo "Node:       $([ $NODE_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
+echo "Deno:       $([ $DENO_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
+echo "TypeScript: $([ $TS_EXIT -eq 0 ] && echo "✓ PASSED" || echo "✗ FAILED")"
 
 # Exit with failure if any runtime failed
-if [ $BUN_EXIT -ne 0 ] || [ $NODE_EXIT -ne 0 ] || [ $DENO_EXIT -ne 0 ]; then
+if [ $BUN_EXIT -ne 0 ] || [ $NODE_EXIT -ne 0 ] || [ $DENO_EXIT -ne 0 ] || [ $TS_EXIT -ne 0 ]; then
     exit 1
 fi
 
