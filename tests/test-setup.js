@@ -4,7 +4,6 @@
 
 const isBun = typeof Bun !== 'undefined';
 const isDeno = typeof Deno !== 'undefined';
-const _isNode = !isBun && !isDeno;
 
 let describe, test, expect, beforeEach, afterEach, mock, spyOn;
 
@@ -341,7 +340,7 @@ if (isBun) {
   
   // Run tests after all are registered
   // Use setTimeout instead of nextTick to ensure all tests are registered
-  setTimeout(async () => {
+  process.nextTick(async () => {
     let passed = 0;
     let failed = 0;
     
@@ -382,7 +381,7 @@ if (isBun) {
     if (typeof process !== 'undefined') {
       process.exitCode = failed > 0 ? 1 : 0;
     }
-  }, 0);
+  });
 }
 
 export { describe, test, expect, beforeEach, afterEach, mock, spyOn };

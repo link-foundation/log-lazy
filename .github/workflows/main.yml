@@ -105,32 +105,51 @@ jobs:
       - name: Run tests (Node)
         if: matrix.runtime == 'node'
         run: |
-          # Verify core library works with Node.js
-          node --input-type=module -e "
-            import makeLog, { levels } from './src/index.js';
-            const log = makeLog({ level: 'info' });
-            console.log('✓ Library imports successfully');
-            console.log('✓ Found', Object.keys(levels).length, 'log levels');
-            log('Test message from Node.js');
-            log.error('Error test');
-            console.log('✅ Node.js compatibility verified');
-          "
-          # Note: Full test suite requires Bun test runner for complete compatibility
+          echo "Running Node.js test suite..."
+          passed=0
+          failed=0
+          for file in tests/{bunyan,debug,log4js,pino,winston,simple-ci,fix-attempt,reorder-import}.test.js; do
+            if [ -f "$file" ]; then
+              name=$(basename "$file")
+              echo -n "Testing $name... "
+              if timeout 5 node "$file" 2>&1 | grep -q "0 failed"; then
+                echo "✓"
+                ((passed++))
+              else
+                echo "✗"
+                ((failed++))
+              fi
+            fi
+          done
+          echo "Node.js tests: $passed passed, $failed failed"
+          if [ $failed -ne 0 ]; then
+            exit 1
+          fi
       
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
         run: |
-          # Verify core library works with Deno
-          deno eval "
-            import makeLog, { levels } from './src/index.js';
-            const log = makeLog({ level: 'info' });
-            console.log('✓ Library imports successfully');
-            console.log('✓ Found', Object.keys(levels).length, 'log levels');
-            log('Test message from Deno');
-            log.error('Error test');
-            console.log('✅ Deno compatibility verified');
-          "
-          # Note: Full test suite requires Bun test runner for complete compatibility
+          echo "Running Deno test suite..."
+          passed=0
+          failed=0
+          # Tests that work with Deno's test runner
+          for file in tests/{debug,log4js,simple-ci,fix-attempt,reorder-import}.test.js; do
+            if [ -f "$file" ]; then
+              name=$(basename "$file")
+              echo -n "Testing $name... "
+              if deno test --allow-read "$file" 2>&1 | grep -q "0 failed"; then
+                echo "✓"
+                ((passed++))
+              else
+                echo "✗"
+                ((failed++))
+              fi
+            fi
+          done
+          echo "Deno tests: $passed passed, $failed failed"
+          if [ $failed -ne 0 ]; then
+            exit 1
+          fi
       
       # Coverage works because we don't import from 'bun:test' anymore
       # Bun test functions are available as globals in test files
