@@ -148,43 +148,75 @@ jobs:
   publish:
     needs: [test, benchmark, lint-and-typecheck, version-check]
     runs-on: ubuntu-latest
-    if: |
-      always() &&
-      github.event_name == 'push' && 
-      github.ref == 'refs/heads/main' && 
-      needs.version-check.result == 'success' &&
-      needs.version-check.outputs.changed == 'true' &&
-      needs.test.result == 'success' &&
-      needs.benchmark.result == 'success'
+    if: always()
     steps:
+      - name: Check conditions
+        id: check
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Version changed: ${{ needs.version-check.outputs.changed }}"
+          echo "Test result: ${{ needs.test.result }}"
+          echo "Benchmark result: ${{ needs.benchmark.result }}"
+          
+          if [ "${{ github.event_name }}" != "push" ] || [ "${{ github.ref }}" != "refs/heads/main" ]; then
+            echo "⊘ Publishing skipped (not a push to main)"
+            exit 0
+          fi
+          
+          if [ "${{ needs.version-check.outputs.changed }}" != "true" ]; then
+            echo "⊘ Publishing skipped (no version change detected)"
+            exit 0
+          fi
+          
+          if [ "${{ needs.test.result }}" != "success" ]; then
+            echo "⊘ Publishing skipped (tests failed)"
+            exit 1
+          fi
+          
+          if [ "${{ needs.benchmark.result }}" != "success" ]; then
+            echo "⊘ Publishing skipped (benchmarks failed)"
+            exit 1
+          fi
+          
+          echo "✓ All conditions met for publishing"
+          echo "should_publish=true" >> $GITHUB_OUTPUT
+      
       - uses: actions/checkout@v4
+        if: steps.check.outputs.should_publish == 'true'
       
       - name: Setup Node.js
+        if: steps.check.outputs.should_publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       
       - name: Setup Bun
+        if: steps.check.outputs.should_publish == 'true'
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
       
       - name: Install dependencies
+        if: steps.check.outputs.should_publish == 'true'
         run: bun install --frozen-lockfile
       
       - name: Build package
+        if: steps.check.outputs.should_publish == 'true'
         run: |
           echo "Building package..."
           # Add build step if needed
           # bun run build
       
       - name: Publish to npm
+        if: steps.check.outputs.should_publish == 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Create GitHub Release
+        if: steps.check.outputs.should_publish == 'true'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -208,13 +240,36 @@ jobs:
           draft: false
           prerelease: false
 
-  notify:
-    needs: [publish, version-check]
+  summary:
+    needs: [test, benchmark, lint-and-typecheck, version-check, publish]
     runs-on: ubuntu-latest
-    if: needs.publish.result == 'success'
+    if: always()
     steps:
-      - name: Notify success
+      - name: Workflow Summary
         run: |
-          echo "✅ Successfully published log-lazy to npm!"
-          echo "📦 Version: ${{ needs.version-check.outputs.version }}"
-          echo "🔗 View on npm: https://www.npmjs.com/package/log-lazy"
+          echo "## Workflow Summary"
+          echo ""
+          echo "### Job Results:"
+          echo "- Version Check: ${{ needs.version-check.result }}"
+          echo "- Tests: ${{ needs.test.result }}"
+          echo "- Benchmarks: ${{ needs.benchmark.result }}"
+          echo "- Lint & Typecheck: ${{ needs.lint-and-typecheck.result }}"
+          echo "- Publish: ${{ needs.publish.result }}"
+          echo ""
+          
+          if [ "${{ needs.version-check.outputs.changed }}" == "true" ]; then
+            echo "### Version Information:"
+            echo "- Version: ${{ needs.version-check.outputs.version }}"
+            echo "- Status: Version was bumped ✅"
+          else
+            echo "### Version Information:"
+            echo "- Version: ${{ needs.version-check.outputs.version }}"
+            echo "- Status: No version change"
+          fi
+          
+          if [ "${{ needs.publish.result }}" == "success" ]; then
+            echo ""
+            echo "### 🎉 Publishing Status:"
+            echo "✅ Package published successfully!"
+            echo "📦 View on npm: https://www.npmjs.com/package/log-lazy"
+          fi
