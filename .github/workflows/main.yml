@@ -200,30 +200,33 @@ jobs:
             COMPARE_TEXT="[Changelog](https://github.com/${{ github.repository }}/compare/v${NPM_VERSION}...v${VERSION})"
           fi
           
-          # Create release using GitHub CLI
+          # Create release using GitHub CLI with heredoc
           gh release create "v${VERSION}" \
             --title "v${VERSION}" \
-            --notes "## 🚀 Release v${VERSION}
+            --notes "$(cat <<EOF
+          ## 🚀 Release v${VERSION}
           
-### 📦 Installation
-\`\`\`bash
-bun add ${PACKAGE_NAME}@${VERSION}
-# or
-npm install ${PACKAGE_NAME}@${VERSION}
-\`\`\`
-
-### 📊 Performance
-- Lazy logging is **100-1000x faster** than traditional logging when disabled
-- **238x faster** in production conditions (mixed workload)
-- Minimal overhead compared to no logs at all
-
-### 🔗 Links
-- [NPM Package](https://www.npmjs.com/package/${PACKAGE_NAME}/v/${VERSION})
-- [Documentation](https://github.com/${{ github.repository }}/blob/v${VERSION}/README.md)
-- ${COMPARE_TEXT}
-
----
-*Published automatically by GitHub Actions*"
+          ### 📦 Installation
+          \`\`\`bash
+          bun add ${PACKAGE_NAME}@${VERSION}
+          # or
+          npm install ${PACKAGE_NAME}@${VERSION}
+          \`\`\`
+          
+          ### 📊 Performance
+          - Lazy logging is **100-1000x faster** than traditional logging when disabled
+          - **238x faster** in production conditions (mixed workload)
+          - Minimal overhead compared to no logs at all
+          
+          ### 🔗 Links
+          - [NPM Package](https://www.npmjs.com/package/${PACKAGE_NAME}/v/${VERSION})
+          - [Documentation](https://github.com/${{ github.repository }}/blob/v${VERSION}/README.md)
+          - ${COMPARE_TEXT}
+          
+          ---
+          *Published automatically by GitHub Actions*
+          EOF
+          )"
 
   summary:
     needs: [test, benchmark, lint-and-typecheck, version-check, publish]
