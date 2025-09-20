@@ -1,7 +1,7 @@
 // Use Bun's test framework when available, fallback to cross-runtime setup
 import { getTestModule } from './test-import-helper.js';
 const testModule = await getTestModule();
-const { describe, test, expect, mock, beforeEach, spyOn } = testModule;
+const { describe, test, expect, mock, beforeEach } = testModule;
 import makeLog from '../src/index.js';
 import pino from 'pino';
 import { Writable } from 'node:stream';
