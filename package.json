@@ -11,7 +11,6 @@
     "bench": "bun run benchmarks/lazy-vs-traditional.bench.js && bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
     "bench:lazy": "bun run benchmarks/lazy-vs-traditional.bench.js",
     "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
-    "prepublishOnly": "bun test && bun run bench",
     "version": "git add -A src",
     "postversion": "git push && git push --tags"
   },
