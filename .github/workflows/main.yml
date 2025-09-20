@@ -5,48 +5,62 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   version-check:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     outputs:
-      changed: ${{ steps.check.outputs.changed }}
-      version: ${{ steps.check.outputs.version }}
       should_publish: ${{ steps.check.outputs.should_publish }}
+      version: ${{ steps.check.outputs.version }}
+      package_name: ${{ steps.check.outputs.package_name }}
+      npm_version: ${{ steps.check.outputs.npm_version }}
     steps:
       - uses: actions/checkout@v4
       
       - name: Check if version needs publishing
         id: check
         run: |
-          # Get version from package.json
+          # Get version and package name from package.json
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           
           echo "Package: $PACKAGE_NAME"
           echo "Current version: $CURRENT_VERSION"
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           
-          # Check if this version exists on npm
+          # Check what version is currently published on npm
           NPM_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "not-found")
+          echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
           
-          if [ "$NPM_VERSION" = "not-found" ]; then
-            echo "Package not found on npm registry - will publish"
-            echo "should_publish=true" >> $GITHUB_OUTPUT
-            echo "changed=true" >> $GITHUB_OUTPUT
-          elif [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
-            echo "Version $CURRENT_VERSION already published to npm"
-            echo "::notice::Version $CURRENT_VERSION is already published"
+          # For PRs, check if version is bumped
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            if [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
+              echo "::error::Version must be bumped for PR. Current version ($CURRENT_VERSION) is already published to npm"
+              exit 1
+            fi
+            echo "✅ Version check passed for PR"
             echo "should_publish=false" >> $GITHUB_OUTPUT
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "Current version ($CURRENT_VERSION) differs from npm version ($NPM_VERSION)"
-            echo "Will publish new version"
-            echo "should_publish=true" >> $GITHUB_OUTPUT
-            echo "changed=true" >> $GITHUB_OUTPUT
+            exit 0
           fi
           
-          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          # For main branch, check if this version exists on npm
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            if [ "$NPM_VERSION" = "not-found" ]; then
+              echo "Package not found on npm registry - will publish"
+              echo "should_publish=true" >> $GITHUB_OUTPUT
+            elif [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
+              echo "Version $CURRENT_VERSION already published to npm"
+              echo "should_publish=false" >> $GITHUB_OUTPUT
+            else
+              echo "Current version ($CURRENT_VERSION) differs from npm version ($NPM_VERSION)"
+              echo "Will publish new version"
+              echo "should_publish=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "should_publish=false" >> $GITHUB_OUTPUT
+          fi
 
   test:
     runs-on: ${{ matrix.os }}
@@ -70,6 +84,7 @@ jobs:
         run: bun test
       
       - name: Run tests with coverage
+        if: matrix.os == 'ubuntu-latest'
         run: bun test --coverage
       
       - name: Upload coverage reports
@@ -80,19 +95,14 @@ jobs:
           path: coverage/
 
   benchmark:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-        bun-version: [latest]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-          bun-version: ${{ matrix.bun-version }}
+          bun-version: latest
       
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -107,7 +117,7 @@ jobs:
           bun run benchmarks/no-logs-vs-lazy-logs.bench.js
       
       - name: Store benchmark results
-        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-results-${{ github.sha }}
@@ -141,128 +151,126 @@ jobs:
   publish:
     needs: [test, benchmark, lint-and-typecheck, version-check]
     runs-on: ubuntu-latest
-    if: always()
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' &&
+      needs.version-check.outputs.should_publish == 'true'
     steps:
-      - name: Check conditions
-        id: check
-        run: |
-          echo "Event: ${{ github.event_name }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Version changed: ${{ needs.version-check.outputs.changed }}"
-          echo "Test result: ${{ needs.test.result }}"
-          echo "Benchmark result: ${{ needs.benchmark.result }}"
-          
-          if [ "${{ github.event_name }}" != "push" ] || [ "${{ github.ref }}" != "refs/heads/main" ]; then
-            echo "⊘ Publishing skipped (not a push to main)"
-            exit 0
-          fi
-          
-          if [ "${{ needs.version-check.outputs.should_publish }}" != "true" ]; then
-            echo "⊘ Publishing skipped (version ${{ needs.version-check.outputs.version }} already published)"
-            exit 0
-          fi
-          
-          if [ "${{ needs.test.result }}" != "success" ]; then
-            echo "⊘ Publishing skipped (tests failed)"
-            exit 1
-          fi
-          
-          if [ "${{ needs.benchmark.result }}" != "success" ]; then
-            echo "⊘ Publishing skipped (benchmarks failed)"
-            exit 1
-          fi
-          
-          echo "✓ All conditions met for publishing"
-          echo "should_publish=true" >> $GITHUB_OUTPUT
-      
       - uses: actions/checkout@v4
-        if: steps.check.outputs.should_publish == 'true'
       
       - name: Setup Node.js
-        if: steps.check.outputs.should_publish == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       
       - name: Setup Bun
-        if: steps.check.outputs.should_publish == 'true'
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
       
       - name: Install dependencies
-        if: steps.check.outputs.should_publish == 'true'
         run: bun install --frozen-lockfile
       
-      - name: Build package
-        if: steps.check.outputs.should_publish == 'true'
-        run: |
-          echo "Building package..."
-          # Add build step if needed
-          # bun run build
-      
       - name: Publish to npm
-        if: steps.check.outputs.should_publish == 'true'
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
+      - name: Create Git Tag
+        run: |
+          VERSION="${{ needs.version-check.outputs.version }}"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin "v${VERSION}"
+      
       - name: Create GitHub Release
-        if: steps.check.outputs.should_publish == 'true'
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ needs.version-check.outputs.version }}
-          release_name: Release v${{ needs.version-check.outputs.version }}
-          body: |
-            ## 🚀 Release v${{ needs.version-check.outputs.version }}
-            
-            ### 📊 Performance
-            - Lazy logging is 100-1000x faster than traditional logging when disabled
-            - Minimal overhead (1.5-5x) compared to no logs for typical operations
-            - Production-ready with bitwise level control
-            
-            ### 📦 Installation
-            ```bash
-            bun add log-lazy@${{ needs.version-check.outputs.version }}
-            ```
-            
-            See [README](https://github.com/${{ github.repository }}/blob/main/README.md) for usage details.
-          draft: false
-          prerelease: false
+        run: |
+          VERSION="${{ needs.version-check.outputs.version }}"
+          PACKAGE_NAME="${{ needs.version-check.outputs.package_name }}"
+          NPM_VERSION="${{ needs.version-check.outputs.npm_version }}"
+          
+          # Create release notes
+          if [ "$NPM_VERSION" = "not-found" ]; then
+            COMPARE_TEXT="Initial release"
+          else
+            COMPARE_TEXT="[Changelog](https://github.com/${{ github.repository }}/compare/v${NPM_VERSION}...v${VERSION})"
+          fi
+          
+          # Create release using GitHub CLI
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes "## 🚀 Release v${VERSION}
+          
+### 📦 Installation
+\`\`\`bash
+bun add ${PACKAGE_NAME}@${VERSION}
+# or
+npm install ${PACKAGE_NAME}@${VERSION}
+\`\`\`
+
+### 📊 Performance
+- Lazy logging is **100-1000x faster** than traditional logging when disabled
+- **238x faster** in production conditions (mixed workload)
+- Minimal overhead compared to no logs at all
+
+### 🔗 Links
+- [NPM Package](https://www.npmjs.com/package/${PACKAGE_NAME}/v/${VERSION})
+- [Documentation](https://github.com/${{ github.repository }}/blob/v${VERSION}/README.md)
+- ${COMPARE_TEXT}
+
+---
+*Published automatically by GitHub Actions*"
 
   summary:
     needs: [test, benchmark, lint-and-typecheck, version-check, publish]
-    runs-on: ubuntu-latest
     if: always()
+    runs-on: ubuntu-latest
     steps:
       - name: Workflow Summary
         run: |
           echo "## Workflow Summary"
           echo ""
-          echo "### Job Results:"
+          echo "### Event Information"
+          echo "- Event: ${{ github.event_name }}"
+          echo "- Branch: ${{ github.ref_name }}"
+          echo "- Commit: ${{ github.sha }}"
+          echo ""
+          
+          echo "### Job Results"
           echo "- Version Check: ${{ needs.version-check.result }}"
           echo "- Tests: ${{ needs.test.result }}"
           echo "- Benchmarks: ${{ needs.benchmark.result }}"
-          echo "- Lint & Typecheck: ${{ needs.lint-and-typecheck.result }}"
-          echo "- Publish: ${{ needs.publish.result }}"
-          echo ""
+          echo "- Lint & Type Check: ${{ needs.lint-and-typecheck.result }}"
           
-          if [ "${{ needs.version-check.outputs.changed }}" == "true" ]; then
-            echo "### Version Information:"
-            echo "- Version: ${{ needs.version-check.outputs.version }}"
-            echo "- Status: Version was bumped ✅"
-          else
-            echo "### Version Information:"
-            echo "- Version: ${{ needs.version-check.outputs.version }}"
-            echo "- Status: No version change"
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "- Publish: ${{ needs.publish.result }}"
+            
+            if [ "${{ needs.version-check.outputs.should_publish }}" == "true" ]; then
+              echo ""
+              echo "### 📦 Publishing"
+              echo "- Package: ${{ needs.version-check.outputs.package_name }}"
+              echo "- Version: ${{ needs.version-check.outputs.version }}"
+              if [ "${{ needs.publish.result }}" == "success" ]; then
+                echo "- Status: ✅ Published successfully!"
+                echo "- View on NPM: https://www.npmjs.com/package/${{ needs.version-check.outputs.package_name }}"
+              elif [ "${{ needs.publish.result }}" == "skipped" ]; then
+                echo "- Status: ⏭️ Skipped (version already published)"
+              else
+                echo "- Status: ❌ Failed"
+              fi
+            else
+              echo ""
+              echo "### 📦 Publishing"
+              echo "- Status: ⏭️ Skipped (no version change)"
+            fi
           fi
           
-          if [ "${{ needs.publish.result }}" == "success" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo ""
-            echo "### 🎉 Publishing Status:"
-            echo "✅ Package published successfully!"
-            echo "📦 View on npm: https://www.npmjs.com/package/log-lazy"
+            echo "### Pull Request Check"
+            echo "All checks completed for PR #${{ github.event.pull_request.number }}"
           fi
