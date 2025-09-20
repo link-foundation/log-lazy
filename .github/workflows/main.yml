@@ -13,46 +13,40 @@ jobs:
     outputs:
       changed: ${{ steps.check.outputs.changed }}
       version: ${{ steps.check.outputs.version }}
+      should_publish: ${{ steps.check.outputs.should_publish }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Get all history for proper comparison
       
-      - name: Check if version was bumped
+      - name: Check if version needs publishing
         id: check
         run: |
-          # Get version from current commit
+          # Get version from package.json
           CURRENT_VERSION=$(node -p "require('./package.json').version")
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          
+          echo "Package: $PACKAGE_NAME"
           echo "Current version: $CURRENT_VERSION"
           
-          # Try to get version from previous commit
-          PREVIOUS_VERSION="0.0.0"
-          if git rev-parse HEAD~1 >/dev/null 2>&1; then
-            # Previous commit exists
-            git checkout HEAD~1 2>/dev/null || true
-            if [ -f "package.json" ]; then
-              PREVIOUS_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
-            fi
-            git checkout - 2>/dev/null || true
-          else
-            # This is the first commit
-            echo "This appears to be the first commit"
-            PREVIOUS_VERSION="0.0.0"
-          fi
+          # Check if this version exists on npm
+          NPM_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "not-found")
           
-          echo "Previous version: $PREVIOUS_VERSION"
-          
-          # Check if version changed
-          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-            echo "Version bumped from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          if [ "$NPM_VERSION" = "not-found" ]; then
+            echo "Package not found on npm registry - will publish"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
             echo "changed=true" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          else
-            # Don't fail, just note that version wasn't bumped
-            echo "::notice::Version not bumped. Current version: $CURRENT_VERSION"
+          elif [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
+            echo "Version $CURRENT_VERSION already published to npm"
+            echo "::notice::Version $CURRENT_VERSION is already published"
+            echo "should_publish=false" >> $GITHUB_OUTPUT
             echo "changed=false" >> $GITHUB_OUTPUT
-            echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "Current version ($CURRENT_VERSION) differs from npm version ($NPM_VERSION)"
+            echo "Will publish new version"
+            echo "should_publish=true" >> $GITHUB_OUTPUT
+            echo "changed=true" >> $GITHUB_OUTPUT
           fi
+          
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
   test:
     runs-on: ${{ matrix.os }}
@@ -164,8 +158,8 @@ jobs:
             exit 0
           fi
           
-          if [ "${{ needs.version-check.outputs.changed }}" != "true" ]; then
-            echo "⊘ Publishing skipped (no version change detected)"
+          if [ "${{ needs.version-check.outputs.should_publish }}" != "true" ]; then
+            echo "⊘ Publishing skipped (version ${{ needs.version-check.outputs.version }} already published)"
             exit 0
           fi
           
