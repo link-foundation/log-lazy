@@ -1,0 +1,177 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  version-bump-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check version bump
+        run: |
+          # Get base branch version
+          BASE_BRANCH="${{ github.base_ref }}"
+          git fetch origin $BASE_BRANCH
+          
+          BASE_VERSION=$(git show origin/$BASE_BRANCH:package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "Base version: $BASE_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [ "$CURRENT_VERSION" == "$BASE_VERSION" ]; then
+            echo "::error::Version must be bumped in package.json"
+            echo "Current version ($CURRENT_VERSION) is the same as base branch version ($BASE_VERSION)"
+            exit 1
+          fi
+          
+          echo "✅ Version bumped from $BASE_VERSION to $CURRENT_VERSION"
+
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Run tests with coverage
+        run: |
+          bun test --coverage
+          
+          # Check coverage threshold (optional)
+          # You can parse coverage output and fail if below threshold
+          echo "✅ Tests passed with coverage"
+
+  benchmark-comparison:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Run benchmarks on current branch
+        run: |
+          echo "=== Current Branch Benchmarks ===" > benchmark-current.txt
+          bun run benchmarks/lazy-vs-traditional.bench.js >> benchmark-current.txt 2>&1
+          echo "" >> benchmark-current.txt
+          bun run benchmarks/no-logs-vs-lazy-logs.bench.js >> benchmark-current.txt 2>&1
+      
+      - name: Checkout base branch
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          git checkout origin/${{ github.base_ref }}
+      
+      - name: Install base dependencies
+        run: bun install
+      
+      - name: Run benchmarks on base branch
+        run: |
+          echo "=== Base Branch Benchmarks ===" > benchmark-base.txt
+          bun run benchmarks/lazy-vs-traditional.bench.js >> benchmark-base.txt 2>&1 || true
+          echo "" >> benchmark-base.txt
+          bun run benchmarks/no-logs-vs-lazy-logs.bench.js >> benchmark-base.txt 2>&1 || true
+      
+      - name: Compare benchmarks
+        run: |
+          echo "📊 Benchmark Comparison"
+          echo "======================"
+          echo ""
+          echo "Base branch benchmarks:"
+          cat benchmark-base.txt || echo "No base benchmarks found"
+          echo ""
+          echo "Current branch benchmarks:"
+          cat benchmark-current.txt
+          echo ""
+          echo "✅ Benchmark comparison complete"
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: bun install
+      
+      - name: Check for console.log statements
+        run: |
+          # Check for console.log in source files (excluding tests and benchmarks)
+          if grep -r "console\.log" src/ --exclude-dir=tests --exclude-dir=benchmarks; then
+            echo "::warning::Found console.log statements in source code"
+          fi
+      
+      - name: Check for TODO comments
+        run: |
+          if grep -r "TODO\|FIXME\|XXX" src/ tests/; then
+            echo "::warning::Found TODO/FIXME comments"
+          fi
+      
+      - name: Validate package.json
+        run: |
+          node -e "
+            const pkg = require('./package.json');
+            if (!pkg.name) throw new Error('Missing package name');
+            if (!pkg.version) throw new Error('Missing package version');
+            if (!pkg.description) throw new Error('Missing package description');
+            if (!pkg.main) throw new Error('Missing package main entry');
+            if (!pkg.keywords || pkg.keywords.length === 0) throw new Error('Missing package keywords');
+            if (!pkg.license) throw new Error('Missing package license');
+            console.log('✅ package.json validation passed');
+          "
+
+  summary:
+    needs: [version-bump-check, test-coverage, benchmark-comparison, code-quality]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: PR Check Summary
+        run: |
+          echo "## PR Check Summary"
+          echo ""
+          
+          if [ "${{ needs.version-bump-check.result }}" == "success" ]; then
+            echo "✅ Version bump check passed"
+          else
+            echo "❌ Version bump check failed"
+          fi
+          
+          if [ "${{ needs.test-coverage.result }}" == "success" ]; then
+            echo "✅ Test coverage check passed"
+          else
+            echo "❌ Test coverage check failed"
+          fi
+          
+          if [ "${{ needs.benchmark-comparison.result }}" == "success" ]; then
+            echo "✅ Benchmark comparison completed"
+          else
+            echo "⚠️ Benchmark comparison failed"
+          fi
+          
+          if [ "${{ needs.code-quality.result }}" == "success" ]; then
+            echo "✅ Code quality check passed"
+          else
+            echo "⚠️ Code quality check failed"
+          fi

@@ -10,17 +10,41 @@
     "test:coverage": "bun test --coverage",
     "bench": "bun run benchmarks/lazy-vs-traditional.bench.js && bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
     "bench:lazy": "bun run benchmarks/lazy-vs-traditional.bench.js",
-    "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js"
+    "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
+    "prepublishOnly": "bun test && bun run bench",
+    "version": "git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
     "logging",
     "lazy",
     "bitwise",
     "levels",
-    "logger"
+    "logger",
+    "performance",
+    "production",
+    "debug",
+    "trace",
+    "bun"
   ],
-  "author": "",
+  "author": "Link Foundation",
   "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/log-lazy.git"
+  },
+  "bugs": {
+    "url": "https://github.com/link-foundation/log-lazy/issues"
+  },
+  "homepage": "https://github.com/link-foundation/log-lazy#readme",
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/bun": "^1.1.13",
     "bunyan": "^1.8.15",

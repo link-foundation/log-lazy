@@ -1,0 +1,32 @@
+# Development files
+tests/
+benchmarks/
+.github/
+coverage/
+
+# Config files
+.gitignore
+bun.lockb
+tsconfig.json
+.editorconfig
+
+# Documentation source files
+docs/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+temp/
+tmp/

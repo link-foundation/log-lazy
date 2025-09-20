@@ -1,5 +1,9 @@
 # log-lazy
 
+[![CI/CD](https://github.com/link-foundation/log-lazy/actions/workflows/main.yml/badge.svg)](https://github.com/link-foundation/log-lazy/actions/workflows/main.yml)
+[![npm version](https://badge.fury.io/js/log-lazy.svg)](https://www.npmjs.com/package/log-lazy)
+[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+
 A high-performance lazy logging library with bitwise level control, designed to keep logging statements in production code with zero performance impact when disabled.
 
 ## 🚀 Key Features
