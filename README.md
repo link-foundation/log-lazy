@@ -6,6 +6,8 @@
 
 A high-performance lazy logging library with bitwise level control, designed to keep logging statements in production code with zero performance impact when disabled.
 
+<img width="3376" height="2400" alt="ray-so-export" src="https://github.com/user-attachments/assets/8c6352fc-e544-40bb-bf91-1040c98b19a9" />
+
 ## 🚀 Key Features
 
 - **Lazy Evaluation**: Log arguments wrapped in functions are only evaluated if logging is enabled
