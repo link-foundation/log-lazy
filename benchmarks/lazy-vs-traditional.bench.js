@@ -42,10 +42,22 @@ class TraditionalLogger {
       mockConsole.log(message);
     }
   }
+  
+  warn(message) {
+    if (this.level === 'warn' || this.level === 'info' || this.level === 'debug') {
+      mockConsole.warn(message);
+    }
+  }
+  
+  error(message) {
+    if (this.level !== 'none') {
+      mockConsole.error(message);
+    }
+  }
 }
 
-// Benchmark: Disabled debug logs with expensive operations
-bench('Traditional logging (debug disabled) - JSON.stringify', () => {
+// Benchmark 1: JSON.stringify (100 iterations)
+bench('Traditional - JSON.stringify (disabled)', () => {
   const logger = new TraditionalLogger('error');
   
   // This ALWAYS evaluates the expensive JSON.stringify
@@ -54,7 +66,7 @@ bench('Traditional logging (debug disabled) - JSON.stringify', () => {
   }
 });
 
-bench('Lazy logging (debug disabled) - JSON.stringify', () => {
+bench('Lazy - JSON.stringify (disabled)', () => {
   const log = makeLog({ 
     level: 'error',
     log: {
@@ -70,8 +82,8 @@ bench('Lazy logging (debug disabled) - JSON.stringify', () => {
   }
 });
 
-// Benchmark: Complex calculations
-bench('Traditional logging (info disabled) - calculations', () => {
+// Benchmark 2: Complex calculations (1000 iterations)
+bench('Traditional - Calculations (disabled)', () => {
   const logger = new TraditionalLogger('error');
   
   for (let i = 0; i < 1000; i++) {
@@ -81,7 +93,7 @@ bench('Traditional logging (info disabled) - calculations', () => {
   }
 });
 
-bench('Lazy logging (info disabled) - calculations', () => {
+bench('Lazy - Calculations (disabled)', () => {
   const log = makeLog({ 
     level: 'error',
     log: {
@@ -97,8 +109,8 @@ bench('Lazy logging (info disabled) - calculations', () => {
   }
 });
 
-// Benchmark: Multiple string concatenations
-bench('Traditional logging (disabled) - string concatenation', () => {
+// Benchmark 3: String concatenation (10000 iterations)
+bench('Traditional - String concat (disabled)', () => {
   const logger = new TraditionalLogger('error');
   
   for (let i = 0; i < 10000; i++) {
@@ -107,7 +119,7 @@ bench('Traditional logging (disabled) - string concatenation', () => {
   }
 });
 
-bench('Lazy logging (disabled) - string concatenation', () => {
+bench('Lazy - String concat (disabled)', () => {
   const log = makeLog({ 
     level: 'error',
     log: {
@@ -122,8 +134,8 @@ bench('Lazy logging (disabled) - string concatenation', () => {
   }
 });
 
-// Benchmark: When logging IS enabled (to show the overhead is minimal)
-bench('Traditional logging (enabled) - simple message', () => {
+// Benchmark 4: When logging IS enabled (to show the overhead)
+bench('Traditional - Simple message (enabled)', () => {
   const logger = new TraditionalLogger('info');
   
   for (let i = 0; i < 1000; i++) {
@@ -131,7 +143,7 @@ bench('Traditional logging (enabled) - simple message', () => {
   }
 });
 
-bench('Lazy logging (enabled) - simple message', () => {
+bench('Lazy - Simple message (enabled)', () => {
   const log = makeLog({ 
     level: 'info',
     log: {
@@ -142,6 +154,55 @@ bench('Lazy logging (enabled) - simple message', () => {
   
   for (let i = 0; i < 1000; i++) {
     log(() => `Simple message ${i}`);
+  }
+});
+
+// Benchmark 5: Mixed workload (production scenario - warn level)
+bench('Traditional - Mixed workload (warn level)', () => {
+  const logger = new TraditionalLogger('warn');
+  
+  for (let i = 0; i < 1000; i++) {
+    // Debug (disabled) - but still evaluates expensive operations
+    logger.debug(`Debug: ${JSON.stringify(largeObject)}`);
+    
+    // Info (disabled) - but still evaluates
+    logger.info(`Info: ${largeObject.users.filter(u => u.id % 2 === 0).length} even users`);
+    
+    // Warn (enabled)
+    logger.warn(`Warning ${i}`);
+    
+    // Error (enabled)
+    if (i % 100 === 0) {
+      logger.error(`Error at ${i}`);
+    }
+  }
+});
+
+bench('Lazy - Mixed workload (warn level)', () => {
+  const log = makeLog({ 
+    level: 'warn',
+    log: {
+      debug: mockConsole.log,
+      info: mockConsole.log,
+      warn: mockConsole.warn,
+      error: mockConsole.error,
+    }
+  });
+  
+  for (let i = 0; i < 1000; i++) {
+    // Debug (disabled) - never evaluates
+    log.debug(() => `Debug: ${JSON.stringify(largeObject)}`);
+    
+    // Info (disabled) - never evaluates
+    log.info(() => `Info: ${largeObject.users.filter(u => u.id % 2 === 0).length} even users`);
+    
+    // Warn (enabled)
+    log.warn(() => `Warning ${i}`);
+    
+    // Error (enabled)
+    if (i % 100 === 0) {
+      log.error(() => `Error at ${i}`);
+    }
   }
 });
 

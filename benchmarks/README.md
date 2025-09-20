@@ -6,6 +6,8 @@ Lazy logging provides **100-1000x faster performance** when logs are disabled, w
 
 ## Lazy vs Traditional Logging
 
+**📊 How to read this chart:** Each pair of bars compares Traditional (blue) vs Lazy (green) logging performance for different operations. Time is in microseconds on a logarithmic scale - lower bars mean faster performance. The massive difference in bar heights shows lazy logging's dramatic performance advantage.
+
 ```mermaid
 ---
 config:
@@ -14,37 +16,47 @@ config:
       backgroundColor: "transparent"
 ---
 xychart-beta
-    title "Lazy vs Traditional Logging Performance (microseconds)"
-    x-axis ["JSON.stringify", "Calculations", "String concat", "When enabled"]
-    y-axis "Time (µs - log scale)" 0.1 --> 200000000
-    bar [1880000, 409.41, 188950000, 0.796]
-    bar [2.40, 36.64, 170.34, 42.53]
+    title "Traditional vs Lazy: Performance Comparison (µs, log scale - lower is better)"
+    x-axis ["JSON.stringify", "Calculations", "String concat", "Mixed workload"]
+    y-axis "Time (microseconds)" 0.1 --> 200000000
+    bar [1910000, 405810, 188360000, 19040000] "Traditional (always evaluates)"
+    bar [2.41, 36.54, 171.80, 79.93] "Lazy (skips when disabled)"
 ```
 
-### JSON.stringify with Disabled Logs
-- **Traditional**: 1.88 ms/iteration (always evaluates)
-- **Lazy**: 2.40 µs/iteration (skips evaluation)
-- **Speedup: ~783x faster**
+### Detailed Benchmark Results
 
-### Complex Calculations with Disabled Logs
-- **Traditional**: 409.41 µs/iteration
-- **Lazy**: 36.64 µs/iteration  
+#### 1. JSON.stringify with Disabled Logs (100 iterations)
+- **Traditional**: 1.91 ms/iteration (always evaluates)
+- **Lazy**: 2.41 µs/iteration (skips evaluation)
+- **Speedup: ~793x faster**
+
+#### 2. Complex Calculations with Disabled Logs (1000 iterations)
+- **Traditional**: 405.81 µs/iteration (always evaluates filters and reductions)
+- **Lazy**: 36.54 µs/iteration (skips all calculations)
 - **Speedup: ~11x faster**
 
-### String Concatenation with Disabled Logs (10,000 iterations)
-- **Traditional**: 188.95 ms/iteration
-- **Lazy**: 170.34 µs/iteration
-- **Speedup: ~1,109x faster**
+#### 3. String Concatenation with Disabled Logs (10,000 iterations)
+- **Traditional**: 188.36 ms/iteration (builds all strings)
+- **Lazy**: 171.80 µs/iteration (skips string building)
+- **Speedup: ~1,097x faster**
 
-### When Logging IS Enabled
-- **Traditional**: 795.73 ns/iteration
-- **Lazy**: 42.53 µs/iteration
-- **Note**: Lazy has ~53µs overhead due to function calls, negligible in real-world usage
+#### 4. Simple Logging When ENABLED (1000 iterations)
+- **Traditional**: 794.98 ns/iteration
+- **Lazy**: 42.37 µs/iteration
+- **Note**: ~53x overhead due to function wrapper, but still microseconds
+
+#### 5. Mixed Workload - Production Scenario (warn level, 1000 iterations)
+This simulates a realistic scenario where debug/info logs are disabled but warn/error are enabled:
+- **Traditional**: 19.04 ms/iteration (still evaluates expensive debug/info operations)
+- **Lazy**: 79.93 µs/iteration (skips debug/info evaluations completely)
+- **Speedup: ~238x faster** in production-like conditions
 
 ## No Logs vs Lazy Logs (Production Mode)
 
 This benchmark shows the cost of keeping lazy logs in production vs removing them entirely:
 
+**📊 How to read this chart:** This compares clean code with zero logging (blue bars) against code with lazy logging disabled (green bars). The relatively small difference between bars shows that lazy logging adds minimal overhead, making it safe to keep in production code.
+
 ```mermaid
 ---
 config:
@@ -53,30 +65,32 @@ config:
       backgroundColor: "transparent"
 ---
 xychart-beta
-    title "No Logs vs Lazy Logs (Production Mode)"
+    title "Production Overhead: Clean Code vs Lazy Logs (µs - lower is better)"
     x-axis ["Simple Order", "Complex Data", "Tight Loop"]
     y-axis "Time (microseconds)" 1 --> 5000
-    bar [17.15, 617.28, 60.88]
-    bar [79.94, 895.81, 4910]
+    bar [16.68, 615.67, 30.30] "No logs at all"
+    bar [80.81, 921.90, 4870] "Lazy logs (disabled)"
 ```
 
-### Simple Order Processing (1000 iterations)
-- **No logs**: 17.15 µs
-- **Lazy logs (disabled)**: 79.94 µs
-- **Overhead**: ~4.7x slower than no logs
-- **Benefit**: Keep debugging capability with minimal cost
+### Detailed Benchmark Results
 
-### Complex Data Processing (1000 iterations)
-- **No logs**: 617.28 µs
-- **Lazy logs (disabled)**: 895.81 µs
-- **Overhead**: ~1.5x slower than no logs
-- **Benefit**: Rich logging available when needed
+#### 1. Simple Order Processing (1000 iterations)
+- **No logs**: 16.68 µs (clean code, no logging at all)
+- **Lazy logs (disabled)**: 80.81 µs (5 log statements, all disabled)
+- **Overhead**: ~4.8x slower
+- **Verdict**: Negligible 64µs overhead for rich debugging capability
 
-### Tight Loop (100k iterations)
-- **No logs**: 60.88 µs
-- **Lazy logs (disabled)**: 4.91 ms
-- **Overhead**: ~80x slower in tight loops
-- **Recommendation**: Avoid logging in tight loops
+#### 2. Complex Data Processing (1000 iterations)
+- **No logs**: 615.67 µs (pure business logic)
+- **Lazy logs (disabled)**: 921.90 µs (7 log statements with JSON.stringify)
+- **Overhead**: ~1.5x slower
+- **Verdict**: Excellent trade-off - 306µs overhead for comprehensive logging
+
+#### 3. Tight Loop (100k iterations)
+- **No logs**: 30.30 µs
+- **Lazy logs (disabled)**: 4.87 ms
+- **Overhead**: ~161x slower
+- **Verdict**: Avoid logging in tight loops - even disabled logs have overhead
 
 ## Key Takeaways
 

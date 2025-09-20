@@ -37,8 +37,8 @@ const order = {
   }
 };
 
-// Benchmark: No logs at all (removed from code)
-bench('No logs - clean code', () => {
+// Benchmark 1: Simple Order Processing (1000 iterations)
+bench('No logs - Simple order', () => {
   function processOrder(order) {
     // No logging at all - clean production code
     const validation = { status: 'valid' };
@@ -52,8 +52,7 @@ bench('No logs - clean code', () => {
   }
 });
 
-// Benchmark: Lazy logs with debug disabled (production mode)
-bench('Lazy logs (disabled) - production mode', () => {
+bench('Lazy logs - Simple order (disabled)', () => {
   const log = makeLog({ 
     level: 'error', // Production mode - only errors
     log: {
@@ -85,8 +84,8 @@ bench('Lazy logs (disabled) - production mode', () => {
   }
 });
 
-// Benchmark: Complex scenario with no logs
-bench('No logs - complex data processing', () => {
+// Benchmark 2: Complex Data Processing (1000 iterations)
+bench('No logs - Complex data', () => {
   function analyzeData(data) {
     const activeUsers = data.users.filter(u => u.id % 2 === 0);
     const totalUsers = data.users.length;
@@ -104,8 +103,7 @@ bench('No logs - complex data processing', () => {
   }
 });
 
-// Benchmark: Complex scenario with lazy logs disabled
-bench('Lazy logs (disabled) - complex data processing', () => {
+bench('Lazy logs - Complex data (disabled)', () => {
   const log = makeLog({ 
     level: 'error',
     log: {
@@ -145,8 +143,8 @@ bench('Lazy logs (disabled) - complex data processing', () => {
   }
 });
 
-// Benchmark: Tight loop with no logs
-bench('No logs - tight loop (100k iterations)', () => {
+// Benchmark 3: Tight Loop (100k iterations)
+bench('No logs - Tight loop', () => {
   let sum = 0;
   for (let i = 0; i < 100000; i++) {
     sum += i * 2;
@@ -158,8 +156,7 @@ bench('No logs - tight loop (100k iterations)', () => {
   return sum;
 });
 
-// Benchmark: Tight loop with lazy logs disabled
-bench('Lazy logs (disabled) - tight loop (100k iterations)', () => {
+bench('Lazy logs - Tight loop (disabled)', () => {
   const log = makeLog({ 
     level: 'error',
     log: {
@@ -176,7 +173,7 @@ bench('Lazy logs (disabled) - tight loop (100k iterations)', () => {
     
     if (i % 1000 === 0) {
       log.debug(() => `Milestone: ${i} iterations, sum: ${sum}`);
-      const temp = Math.sqrt(sum);
+      Math.sqrt(sum);
     }
   }
   return sum;

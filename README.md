@@ -714,7 +714,9 @@ console.timeEnd('lazy'); // ~5ms - near zero cost!
 
 Real benchmark results from [benchmarks/README.md](benchmarks/README.md):
 
-### Lazy vs Traditional (with logging disabled):
+### Real-World Performance Comparison
+
+**📊 How to read this chart:** This shows a realistic production scenario with `warn` log level. Debug and info logs are disabled, but traditional logging still evaluates their expensive operations. The bars show execution time (lower is better).
 
 ```mermaid
 ---
@@ -724,37 +726,27 @@ config:
       backgroundColor: "transparent"
 ---
 xychart-beta
-    title "Performance Comparison: Lazy vs Traditional (lower is better)"
-    x-axis ["JSON.stringify", "Calculations", "String concat"]
-    y-axis "Time (µs - log scale)" 1 --> 200000000
-    bar [1880000, 409.41, 188950000]
-    bar [2.40, 36.64, 170.34]
+    title "Production Performance: Mixed Workload at Warn Level (lower is better)"
+    x-axis ["Traditional Logging", "Lazy Logging"]
+    y-axis "Time (milliseconds)" 0.01 --> 100
+    bar [19.04, 0.08] "Execution time"
 ```
-- **JSON.stringify**: 783x faster (1.88ms → 2.40µs)
-- **Array calculations**: 11x faster (409µs → 37µs)  
-- **String concatenation**: 1,109x faster (189ms → 170µs)
 
-### Lazy vs No Logs (production overhead):
+**Key Results:**
+- **Traditional**: 19.04 ms - Still evaluates all debug/info expressions even when disabled
+- **Lazy**: 0.08 ms (79.93 µs) - Skips evaluation of disabled logs completely
+- **Performance Gain: 238x faster** in production conditions
 
-```mermaid
----
-config:
-  themeVariables:
-    xyChart:
-      backgroundColor: "transparent"
----
-xychart-beta
-    title "Production Overhead: No Logs vs Lazy Logs"
-    x-axis ["Simple ops", "Complex ops", "Tight loops"]
-    y-axis "Time (microseconds)" 1 --> 5000
-    bar [17.15, 617.28, 60.88]
-    bar [79.94, 895.81, 4910]
-```
-- **Simple operations**: ~4.7x overhead (17µs → 80µs)
-- **Complex operations**: ~1.5x overhead (617µs → 896µs)
-- **Tight loops**: ~80x overhead (avoid logging here)
+This mixed workload includes:
+- Disabled debug logs with `JSON.stringify(largeObject)`
+- Disabled info logs with array filtering and calculations
+- Enabled warn and error logs (both approaches log these)
 
-The benchmarks prove lazy logging is **100-1000x faster** than traditional logging when disabled, with minimal overhead vs having no logs at all.
+### Production Overhead Analysis
+
+For detailed comparisons including overhead vs clean code, see [benchmarks/README.md](benchmarks/README.md).
+
+**Summary**: Lazy logging is **100-1000x faster** than traditional logging when disabled, with minimal overhead (1.5-5x) compared to having no logs at all for typical operations.
 
 Run benchmarks yourself: `bun run bench`
 
