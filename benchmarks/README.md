@@ -6,7 +6,7 @@ Lazy logging provides **100-1000x faster performance** when logs are disabled, w
 
 ## Lazy vs Traditional Logging
 
-**📊 How to read this chart:** Each pair of bars compares Traditional (blue) vs Lazy (green) logging performance for different operations. Time is in microseconds on a logarithmic scale - lower bars mean faster performance. The massive difference in bar heights shows lazy logging's dramatic performance advantage.
+**📊 How to read this chart:** Each x-axis category shows two bars - Traditional (first/blue) vs Lazy (second/green) logging performance. Time is in microseconds on a logarithmic scale - lower bars mean faster performance. The massive difference in bar heights shows lazy logging's dramatic performance advantage.
 
 ```mermaid
 ---
@@ -19,8 +19,8 @@ xychart-beta
     title "Traditional vs Lazy: Performance Comparison (µs, log scale - lower is better)"
     x-axis ["JSON.stringify", "Calculations", "String concat", "Mixed workload"]
     y-axis "Time (microseconds)" 0.1 --> 200000000
-    bar [1910000, 405810, 188360000, 19040000] "Traditional (always evaluates)"
-    bar [2.41, 36.54, 171.80, 79.93] "Lazy (skips when disabled)"
+    bar [1910000, 405810, 188360000, 19040000]
+    bar [2.41, 36.54, 171.80, 79.93]
 ```
 
 ### Detailed Benchmark Results
@@ -55,7 +55,7 @@ This simulates a realistic scenario where debug/info logs are disabled but warn/
 
 This benchmark shows the cost of keeping lazy logs in production vs removing them entirely:
 
-**📊 How to read this chart:** This compares clean code with zero logging (blue bars) against code with lazy logging disabled (green bars). The relatively small difference between bars shows that lazy logging adds minimal overhead, making it safe to keep in production code.
+**📊 How to read this chart:** This compares clean code with zero logging (first/blue bars) against code with lazy logging disabled (second/green bars). The relatively small difference between bars shows that lazy logging adds minimal overhead, making it safe to keep in production code.
 
 ```mermaid
 ---
@@ -68,8 +68,8 @@ xychart-beta
     title "Production Overhead: Clean Code vs Lazy Logs (µs - lower is better)"
     x-axis ["Simple Order", "Complex Data", "Tight Loop"]
     y-axis "Time (microseconds)" 1 --> 5000
-    bar [16.68, 615.67, 30.30] "No logs at all"
-    bar [80.81, 921.90, 4870] "Lazy logs (disabled)"
+    bar [16.68, 615.67, 30.30]
+    bar [80.81, 921.90, 4870]
 ```
 
 ### Detailed Benchmark Results
