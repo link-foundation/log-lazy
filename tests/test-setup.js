@@ -84,6 +84,29 @@ if (isBun) {
         if (actual.calls && actual.calls.length > 0) {
           throw new Error(`Expected function not to have been called`);
         }
+      },
+      toBe: (expected) => {
+        if (actual === expected) {
+          throw new Error(`Expected ${actual} not to be ${expected}`);
+        }
+      }
+    },
+    toHaveProperty: (prop, value) => {
+      if (!(prop in actual)) {
+        throw new Error(`Expected object to have property ${prop}`);
+      }
+      if (value !== undefined && actual[prop] !== value) {
+        throw new Error(`Expected property ${prop} to be ${value}, but got ${actual[prop]}`);
+      }
+    },
+    toThrow: () => {
+      try {
+        actual();
+        throw new Error(`Expected function to throw`);
+      } catch (e) {
+        if (e.message === 'Expected function to throw') {
+          throw e;
+        }
       }
     }
   });
@@ -91,14 +114,20 @@ if (isBun) {
   beforeEach = () => {}; // No-op for Deno
   afterEach = () => {}; // No-op for Deno
   
-  mock = () => {
+  mock = (implementation) => {
     const fn = (...args) => {
       fn.calls.push(args);
+      fn.mock.calls.push(args);
+      if (implementation) {
+        return implementation(...args);
+      }
       return fn.returnValue;
     };
     fn.calls = [];
+    fn.mock = { calls: [] };
     fn.mockRestore = () => {
       fn.calls = [];
+      fn.mock.calls = [];
     };
     return fn;
   };
@@ -106,12 +135,36 @@ if (isBun) {
   spyOn = (obj, method) => {
     const original = obj[method];
     const spy = mock();
-    obj[method] = spy;
-    spy.mockRestore = () => {
+    // Set up the initial spy function
+    obj[method] = (...args) => {
+      spy.calls.push(args);
+      spy.mock.calls.push(args);
+      return spy.returnValue;
+    };
+    // Keep reference to spy object on the replaced function
+    obj[method].calls = spy.calls;
+    obj[method].mock = spy.mock;
+    obj[method].mockImplementation = (implementation) => {
+      obj[method] = (...args) => {
+        spy.calls.push(args);
+        spy.mock.calls.push(args);
+        if (implementation) {
+          return implementation(...args);
+        }
+        return spy.returnValue;
+      };
+      obj[method].calls = spy.calls;
+      obj[method].mock = spy.mock;
+      obj[method].mockImplementation = spy.mockImplementation;
+      obj[method].mockRestore = spy.mockRestore;
+      return obj[method];
+    };
+    obj[method].mockRestore = () => {
       obj[method] = original;
       spy.calls = [];
+      spy.mock.calls = [];
     };
-    return spy;
+    return obj[method];
   };
 } else {
   // Node.js - use a simple test runner
@@ -198,6 +251,29 @@ if (isBun) {
         if (actual.calls && actual.calls.length > 0) {
           throw new Error(`Expected function not to have been called`);
         }
+      },
+      toBe: (expected) => {
+        if (actual === expected) {
+          throw new Error(`Expected ${actual} not to be ${expected}`);
+        }
+      }
+    },
+    toHaveProperty: (prop, value) => {
+      if (!(prop in actual)) {
+        throw new Error(`Expected object to have property ${prop}`);
+      }
+      if (value !== undefined && actual[prop] !== value) {
+        throw new Error(`Expected property ${prop} to be ${value}, but got ${actual[prop]}`);
+      }
+    },
+    toThrow: () => {
+      try {
+        actual();
+        throw new Error(`Expected function to throw`);
+      } catch (e) {
+        if (e.message === 'Expected function to throw') {
+          throw e;
+        }
       }
     }
   });
@@ -210,14 +286,20 @@ if (isBun) {
     afterEachFn = fn;
   };
   
-  mock = () => {
+  mock = (implementation) => {
     const fn = (...args) => {
       fn.calls.push(args);
+      fn.mock.calls.push(args);
+      if (implementation) {
+        return implementation(...args);
+      }
       return fn.returnValue;
     };
     fn.calls = [];
+    fn.mock = { calls: [] };
     fn.mockRestore = () => {
       fn.calls = [];
+      fn.mock.calls = [];
     };
     return fn;
   };
@@ -225,16 +307,41 @@ if (isBun) {
   spyOn = (obj, method) => {
     const original = obj[method];
     const spy = mock();
-    obj[method] = spy;
-    spy.mockRestore = () => {
+    // Set up the initial spy function
+    obj[method] = (...args) => {
+      spy.calls.push(args);
+      spy.mock.calls.push(args);
+      return spy.returnValue;
+    };
+    // Keep reference to spy object on the replaced function
+    obj[method].calls = spy.calls;
+    obj[method].mock = spy.mock;
+    obj[method].mockImplementation = (implementation) => {
+      obj[method] = (...args) => {
+        spy.calls.push(args);
+        spy.mock.calls.push(args);
+        if (implementation) {
+          return implementation(...args);
+        }
+        return spy.returnValue;
+      };
+      obj[method].calls = spy.calls;
+      obj[method].mock = spy.mock;
+      obj[method].mockImplementation = spy.mockImplementation;
+      obj[method].mockRestore = spy.mockRestore;
+      return obj[method];
+    };
+    obj[method].mockRestore = () => {
       obj[method] = original;
       spy.calls = [];
+      spy.mock.calls = [];
     };
-    return spy;
+    return obj[method];
   };
   
   // Run tests after all are registered
-  process.nextTick(async () => {
+  // Use setTimeout instead of nextTick to ensure all tests are registered
+  setTimeout(async () => {
     let passed = 0;
     let failed = 0;
     
@@ -275,7 +382,7 @@ if (isBun) {
     if (typeof process !== 'undefined') {
       process.exitCode = failed > 0 ? 1 : 0;
     }
-  });
+  }, 0);
 }
 
 export { describe, test, expect, beforeEach, afterEach, mock, spyOn };
