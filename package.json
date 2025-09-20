@@ -19,7 +19,12 @@
   "author": "",
   "license": "Unlicense",
   "devDependencies": {
-    "@types/bun": "^1.1.13"
+    "@types/bun": "^1.1.13",
+    "debug": "^4.3.4",
+    "winston": "^3.11.0",
+    "log4js": "^6.9.1",
+    "pino": "^8.16.2",
+    "bunyan": "^1.8.15"
   },
   "engines": {
     "bun": ">=1.0.0"

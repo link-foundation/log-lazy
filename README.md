@@ -348,6 +348,290 @@ const logger = new LazyLog({
 });
 ```
 
+## 🔌 Integration with Popular Logging Libraries
+
+log-lazy can seamlessly integrate with existing logging libraries, adding lazy evaluation to improve their performance.
+
+### Debug Integration
+
+The `debug` library is popular for its simplicity and namespace support:
+
+```javascript
+import { LazyLog } from 'log-lazy';
+import createDebug from 'debug';
+
+// Create debug instances for different namespaces
+const debugApp = createDebug('app');
+const debugDB = createDebug('app:db');
+const debugHTTP = createDebug('app:http');
+
+// Integrate with log-lazy
+const logger = new LazyLog({
+  level: process.env.DEBUG ? 'all' : 'warn',
+  log: {
+    fatal: (...args) => debugApp('FATAL:', ...args),
+    error: (...args) => debugApp('ERROR:', ...args),
+    warn: (...args) => debugApp('WARN:', ...args),
+    info: (...args) => debugApp('INFO:', ...args),
+    debug: (...args) => debugDB(...args),
+    verbose: (...args) => debugHTTP(...args),
+    trace: (...args) => debugApp('TRACE:', ...args),
+    silly: (...args) => debugApp('SILLY:', ...args)
+  }
+});
+
+// Use with lazy evaluation
+logger.debug('DB Query:', () => JSON.stringify(query));
+logger.verbose('HTTP Request:', () => ({
+  method: req.method,
+  url: req.url,
+  headers: req.headers
+}));
+```
+
+### Winston Integration
+
+Winston is a multi-transport async logging library:
+
+```javascript
+import { LazyLog } from 'log-lazy';
+import winston from 'winston';
+
+// Configure Winston
+const winstonLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  ]
+});
+
+// Integrate with log-lazy
+const logger = new LazyLog({
+  level: 'all',
+  log: {
+    fatal: (...args) => winstonLogger.error('FATAL', ...args),
+    error: (...args) => winstonLogger.error(...args),
+    warn: (...args) => winstonLogger.warn(...args),
+    info: (...args) => winstonLogger.info(...args),
+    debug: (...args) => winstonLogger.debug(...args),
+    verbose: (...args) => winstonLogger.verbose(...args),
+    trace: (...args) => winstonLogger.silly(...args), // Winston uses 'silly' for trace
+    silly: (...args) => winstonLogger.silly(...args)
+  }
+});
+
+// Lazy evaluation with Winston's metadata support
+logger.info('User action', () => ({
+  userId: user.id,
+  action: 'login',
+  metadata: computeExpensiveMetadata()
+}));
+```
+
+### Log4js Integration
+
+Log4js provides a familiar logging interface similar to Log4j:
+
+```javascript
+import { LazyLog } from 'log-lazy';
+import log4js from 'log4js';
+
+// Configure Log4js
+log4js.configure({
+  appenders: {
+    console: { type: 'console' },
+    file: { type: 'file', filename: 'app.log' },
+    errors: { type: 'file', filename: 'errors.log' }
+  },
+  categories: {
+    default: { appenders: ['console', 'file'], level: 'info' },
+    errors: { appenders: ['errors', 'console'], level: 'error' }
+  }
+});
+
+const log4jsLogger = log4js.getLogger();
+const errorLogger = log4js.getLogger('errors');
+
+// Integrate with log-lazy
+const logger = new LazyLog({
+  level: 'all',
+  log: {
+    fatal: (...args) => log4jsLogger.fatal(...args),
+    error: (...args) => errorLogger.error(...args),
+    warn: (...args) => log4jsLogger.warn(...args),
+    info: (...args) => log4jsLogger.info(...args),
+    debug: (...args) => log4jsLogger.debug(...args),
+    verbose: (...args) => log4jsLogger.trace(...args), // Log4js uses trace for verbose
+    trace: (...args) => log4jsLogger.trace(...args),
+    silly: (...args) => log4jsLogger.trace('SILLY:', ...args)
+  }
+});
+
+// Use with lazy evaluation
+logger.debug('Processing batch', () => ({
+  size: batch.length,
+  items: batch.map(item => item.id)
+}));
+```
+
+### Pino Integration
+
+Pino is an extremely fast Node.js logger with low overhead:
+
+```javascript
+import { LazyLog } from 'log-lazy';
+import pino from 'pino';
+
+// Configure Pino
+const pinoLogger = pino({
+  level: process.env.PINO_LOG_LEVEL || 'info',
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true
+    }
+  }
+});
+
+// Integrate with log-lazy - Pino expects objects as first argument
+const logger = new LazyLog({
+  level: 'all',
+  log: {
+    fatal: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.fatal(rest[0] || {}, msg);
+    },
+    error: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.error(rest[0] || {}, msg);
+    },
+    warn: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.warn(rest[0] || {}, msg);
+    },
+    info: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.info(rest[0] || {}, msg);
+    },
+    debug: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.debug(rest[0] || {}, msg);
+    },
+    verbose: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.trace(rest[0] || {}, msg);
+    },
+    trace: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.trace(rest[0] || {}, msg);
+    },
+    silly: (...args) => {
+      const [msg, ...rest] = args;
+      pinoLogger.trace(rest[0] || {}, msg);
+    }
+  }
+});
+
+// Pino-friendly lazy evaluation
+logger.info('Request completed', () => ({
+  responseTime: Date.now() - startTime,
+  statusCode: res.statusCode,
+  path: req.url
+}));
+```
+
+### Bunyan Integration
+
+Bunyan provides structured JSON logging:
+
+```javascript
+import { LazyLog } from 'log-lazy';
+import bunyan from 'bunyan';
+
+// Configure Bunyan
+const bunyanLogger = bunyan.createLogger({
+  name: 'myapp',
+  streams: [
+    {
+      level: 'info',
+      stream: process.stdout
+    },
+    {
+      level: 'error',
+      path: '/var/log/myapp-error.log'
+    }
+  ],
+  serializers: bunyan.stdSerializers
+});
+
+// Create child logger for specific component
+const componentLogger = bunyanLogger.child({ component: 'api' });
+
+// Integrate with log-lazy
+const logger = new LazyLog({
+  level: 'all',
+  log: {
+    fatal: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.fatal(rest[0] || {}, msg);
+    },
+    error: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.error(rest[0] || {}, msg);
+    },
+    warn: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.warn(rest[0] || {}, msg);
+    },
+    info: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.info(rest[0] || {}, msg);
+    },
+    debug: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.debug(rest[0] || {}, msg);
+    },
+    verbose: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.trace(rest[0] || {}, msg);
+    },
+    trace: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.trace(rest[0] || {}, msg);
+    },
+    silly: (...args) => {
+      const [msg, ...rest] = args;
+      componentLogger.trace({ level: 'silly', ...rest[0] }, msg);
+    }
+  }
+});
+
+// Bunyan-style structured logging with lazy evaluation
+logger.error('Database error', () => ({
+  err: error, // Bunyan will serialize this
+  query: query,
+  duration: Date.now() - queryStart,
+  user: req.user.id
+}));
+```
+
+### Benefits of Integration
+
+By integrating log-lazy with existing loggers, you get:
+
+1. **Zero-cost disabled logs** - Expensive computations only run when needed
+2. **Keep existing infrastructure** - Continue using your current logging setup
+3. **Gradual migration** - Add lazy evaluation incrementally
+4. **Production safety** - Leave detailed logs in production code without performance impact
+
 ### Conditional Lazy Loading
 
 ```javascript
