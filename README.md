@@ -723,12 +723,12 @@ config:
     xyChart:
       backgroundColor: "transparent"
 ---
-xychart horizontal
+xychart-beta
     title "Performance Comparison: Lazy vs Traditional (lower is better)"
-    x-axis "Time (microseconds - log scale)"
-    y-axis ["JSON.stringify", "Calculations", "String concat"]
-    bar [1880000, 409.41, 188950000] "Traditional"
-    bar [2.40, 36.64, 170.34] "Lazy"
+    x-axis ["JSON.stringify", "Calculations", "String concat"]
+    y-axis "Time (µs - log scale)" 1 --> 200000000
+    bar [1880000, 409.41, 188950000]
+    bar [2.40, 36.64, 170.34]
 ```
 - **JSON.stringify**: 783x faster (1.88ms → 2.40µs)
 - **Array calculations**: 11x faster (409µs → 37µs)  
@@ -743,12 +743,12 @@ config:
     xyChart:
       backgroundColor: "transparent"
 ---
-xychart horizontal
+xychart-beta
     title "Production Overhead: No Logs vs Lazy Logs"
-    x-axis "Time (microseconds)"
-    y-axis ["Simple ops", "Complex ops", "Tight loops"]
-    bar [17.15, 617.28, 60.88] "No Logs"
-    bar [79.94, 895.81, 4910] "Lazy (disabled)"
+    x-axis ["Simple ops", "Complex ops", "Tight loops"]
+    y-axis "Time (microseconds)" 1 --> 5000
+    bar [17.15, 617.28, 60.88]
+    bar [79.94, 895.81, 4910]
 ```
 - **Simple operations**: ~4.7x overhead (17µs → 80µs)
 - **Complex operations**: ~1.5x overhead (617µs → 896µs)
