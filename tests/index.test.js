@@ -1,4 +1,11 @@
-import { describe, test, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test';
+// Use Bun's test framework when available, fallback to cross-runtime setup
+const isBun = typeof Bun !== 'undefined';
+const testModule = isBun 
+  ? await import('bun:test')
+  : await import('./test-setup.js');
+
+const { describe, test, expect, beforeEach, afterEach, mock, spyOn } = testModule;
+
 import makeLog, { defaultLog, log, levels, levelNames } from '../src/index.js';
 
 // Helper to create LazyLog-compatible object from makeLog

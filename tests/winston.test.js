@@ -1,4 +1,10 @@
-import { describe, test, expect, beforeEach, mock } from 'bun:test';
+// Use Bun's test framework when available, fallback to cross-runtime setup
+const isBun = typeof Bun !== 'undefined';
+const testModule = isBun 
+  ? await import('bun:test')
+  : await import('./test-setup.js');
+
+const { describe, test, expect, beforeEach, mock } = testModule;
 import makeLog from '../src/index.js';
 import winston from 'winston';
 import Transport from 'winston-transport';

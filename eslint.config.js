@@ -15,6 +15,8 @@ export default [
         __filename: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
+        Bun: 'readonly',
+        Deno: 'readonly',
       }
     },
     rules: {
