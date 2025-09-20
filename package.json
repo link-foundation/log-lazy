@@ -1,0 +1,27 @@
+{
+  "name": "log-lazy",
+  "version": "1.0.0",
+  "description": "A lazy logging library with bitwise level control",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage"
+  },
+  "keywords": [
+    "logging",
+    "lazy",
+    "bitwise",
+    "levels",
+    "logger"
+  ],
+  "author": "",
+  "license": "Unlicense",
+  "devDependencies": {
+    "@types/bun": "^1.1.13"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}
