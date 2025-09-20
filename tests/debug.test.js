@@ -1,5 +1,5 @@
 import { describe, test, expect, mock } from 'bun:test';
-import { LazyLog } from '../src/index.js';
+import makeLog from '../src/index.js';
 
 describe('Debug Integration', () => {
   test('should integrate with debug-style library', () => {
@@ -8,7 +8,7 @@ describe('Debug Integration', () => {
     const mockDebugDB = mock((...args) => {});
     const mockDebugHTTP = mock((...args) => {});
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => mockDebug('FATAL:', ...args),
@@ -23,22 +23,22 @@ describe('Debug Integration', () => {
     });
     
     // Test basic logging
-    logger.info('Test message');
+    log.info('Test message');
     expect(mockDebug).toHaveBeenCalledWith('INFO:', 'Test message');
     
     // Test debug namespace
-    logger.debug('DB query');
+    log.debug('DB query');
     expect(mockDebugDB).toHaveBeenCalledWith('DB query');
     
     // Test verbose/HTTP namespace
-    logger.verbose('HTTP request');
+    log.verbose('HTTP request');
     expect(mockDebugHTTP).toHaveBeenCalledWith('HTTP request');
   });
   
   test('should handle lazy evaluation', () => {
     const mockDebug = mock((...args) => {});
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         debug: (...args) => mockDebug(...args)
@@ -46,7 +46,7 @@ describe('Debug Integration', () => {
     });
     
     const expensiveFunc = mock(() => 'expensive result');
-    logger.debug('Debug:', expensiveFunc);
+    log.debug('Debug:', expensiveFunc);
     
     expect(expensiveFunc).toHaveBeenCalled();
     expect(mockDebug).toHaveBeenCalledWith('Debug:', 'expensive result');
@@ -55,7 +55,7 @@ describe('Debug Integration', () => {
   test('lazy evaluation should not execute when disabled', () => {
     const mockDebug = mock((...args) => {});
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'none', // Disable all logging
       log: {
         info: (...args) => mockDebug(...args)
@@ -67,7 +67,7 @@ describe('Debug Integration', () => {
     });
     
     // Should not evaluate function when logging is disabled
-    logger.info('Message:', expensiveFunc);
+    log.info('Message:', expensiveFunc);
     expect(expensiveFunc).not.toHaveBeenCalled();
     expect(mockDebug).not.toHaveBeenCalled();
   });
@@ -75,7 +75,7 @@ describe('Debug Integration', () => {
   test('should handle complex objects', () => {
     const mockDebug = mock((...args) => {});
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => mockDebug(...args)
@@ -87,7 +87,7 @@ describe('Debug Integration', () => {
       timestamp: Date.now()
     };
     
-    logger.info('Complex data:', () => complexData);
+    log.info('Complex data:', () => complexData);
     expect(mockDebug).toHaveBeenCalled();
     expect(mockDebug.mock.calls[0][0]).toBe('Complex data:');
     expect(mockDebug.mock.calls[0][1]).toEqual(complexData);
@@ -100,7 +100,7 @@ describe('Debug Integration', () => {
       'app:http': mock((...args) => {})
     };
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => namespaces['app'](...args),
@@ -109,13 +109,13 @@ describe('Debug Integration', () => {
       }
     });
     
-    logger.info('App message');
+    log.info('App message');
     expect(namespaces['app']).toHaveBeenCalledWith('App message');
     
-    logger.debug('DB message');
+    log.debug('DB message');
     expect(namespaces['app:db']).toHaveBeenCalledWith('DB message');
     
-    logger.verbose('HTTP message');
+    log.verbose('HTTP message');
     expect(namespaces['app:http']).toHaveBeenCalledWith('HTTP message');
   });
 });

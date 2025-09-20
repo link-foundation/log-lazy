@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test';
-import { LazyLog } from '../src/index.js';
+import makeLog from '../src/index.js';
 
 describe('Template Literal Lazy Evaluation', () => {
   let consoleErrorSpy, consoleWarnSpy, consoleLogSpy;
@@ -17,8 +17,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should evaluate template literals lazily with () => syntax', () => {
-    const logger = new LazyLog({ level: 'all' });
-    const log = logger.log; // Use shorter syntax
+    const log = makeLog({ level: 'all' }); // makeLog returns log directly
     
     const expensiveOperation = mock(() => 'expensive');
     const data = { test: 'data' };
@@ -34,8 +33,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should not evaluate template literals when logging is disabled', () => {
-    const logger = new LazyLog({ level: 'error' }); // Only error level
-    const log = logger.log;
+    const log = makeLog({ level: 'error' }); // Only error level
     
     const expensiveOperation = mock(() => {
       throw new Error('Should not be called!');
@@ -50,8 +48,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should handle complex template literals with multiple expressions', () => {
-    const logger = new LazyLog({ level: 'all' });
-    const log = logger.log;
+    const log = makeLog({ level: 'all' });
     
     const users = [{ id: 1, active: true }, { id: 2, active: false }, { id: 3, active: true }];
     const calculateTotal = mock(() => 150.50);
@@ -65,8 +62,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should work with multi-line template literals', () => {
-    const logger = new LazyLog({ level: 'all' });
-    const log = logger.log;
+    const log = makeLog({ level: 'all' });
     
     const order = {
       id: '12345',
@@ -91,8 +87,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should handle JSON.stringify in template literals efficiently', () => {
-    const logger = new LazyLog({ level: 'none' }); // Disable all logging
-    const log = logger.log;
+    const log = makeLog({ level: 'none' }); // Disable all logging
     
     const largeObject = {
       data: new Array(1000).fill(0).map((_, i) => ({ id: i, value: Math.random() }))
@@ -107,8 +102,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should work with shorter log() syntax as shown in README', () => {
-    const logger = new LazyLog({ level: 'all' }); // Enable all levels for testing
-    const log = logger.log;
+    const log = makeLog({ level: 'all' }); // Enable all levels for testing
     
     const port = 3000;
     const error = new Error('Connection failed');
@@ -122,8 +116,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should handle expensive calculations in template literals', () => {
-    const logger = new LazyLog({ level: 'all' });
-    const log = logger.log;
+    const log = makeLog({ level: 'all' });
     
     const order = {
       id: 'ORD-001',
@@ -147,8 +140,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should not execute expensive calculations when disabled', () => {
-    const logger = new LazyLog({ level: 'warn' }); // Only warn and above
-    const log = logger.log;
+    const log = makeLog({ level: 'warn' }); // Only warn and above
     
     const order = {
       id: 'ORD-002',
@@ -166,8 +158,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('real-world example from README should work', () => {
-    const logger = new LazyLog({ level: 'info' });
-    const log = logger.log;
+    const log = makeLog({ level: 'info' });
     
     function processOrder(order) {
       // Mock functions for testing
@@ -200,8 +191,7 @@ describe('Template Literal Lazy Evaluation', () => {
   });
 
   test('should handle the migration pattern: just add () =>', () => {
-    const logger = new LazyLog({ level: 'all' });
-    const log = logger.log;
+    const log = makeLog({ level: 'all' });
     
     const user = { id: 1, name: 'Alice', role: 'admin' };
     const posts = [{ id: 1, title: 'Post 1' }, { id: 2, title: 'Post 2' }];

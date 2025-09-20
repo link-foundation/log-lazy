@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
-import { LazyLog } from '../src/index.js';
+import makeLog from '../src/index.js';
 import winston from 'winston';
 import Transport from 'winston-transport';
 
@@ -33,7 +33,7 @@ describe('Winston Integration', () => {
   });
 
   test('should integrate with Winston logger', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => winstonLogger.error('FATAL', ...args),
@@ -47,7 +47,7 @@ describe('Winston Integration', () => {
       }
     });
     
-    logger.info('Test message');
+    log.info('Test message');
     expect(mockTransport.logMock).toHaveBeenCalled();
     
     const logCall = mockTransport.logMock.mock.calls[0][0];
@@ -56,7 +56,7 @@ describe('Winston Integration', () => {
   });
   
   test('should handle Winston metadata with lazy evaluation', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => {
@@ -72,7 +72,7 @@ describe('Winston Integration', () => {
       timestamp: Date.now()
     }));
     
-    logger.info('User action', expensiveMetadata);
+    log.info('User action', expensiveMetadata);
     
     expect(expensiveMetadata).toHaveBeenCalled();
     expect(mockTransport.logMock).toHaveBeenCalled();
@@ -82,7 +82,7 @@ describe('Winston Integration', () => {
   });
   
   test('lazy evaluation should prevent execution when disabled', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'error', // Only error level
       log: {
         error: (...args) => winstonLogger.error(...args),
@@ -92,17 +92,17 @@ describe('Winston Integration', () => {
     
     const expensiveFunc = mock(() => 'expensive result');
     
-    logger.info('Info message:', expensiveFunc);
+    log.info('Info message:', expensiveFunc);
     expect(expensiveFunc).not.toHaveBeenCalled();
     expect(mockTransport.logMock).not.toHaveBeenCalled();
     
-    logger.error('Error message:', expensiveFunc);
+    log.error('Error message:', expensiveFunc);
     expect(expensiveFunc).toHaveBeenCalled();
     expect(mockTransport.logMock).toHaveBeenCalled();
   });
   
   test('should map log levels correctly', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => winstonLogger.error('FATAL:', ...args),
@@ -116,11 +116,11 @@ describe('Winston Integration', () => {
       }
     });
     
-    logger.trace('Trace message');
+    log.trace('Trace message');
     const traceCall = mockTransport.logMock.mock.calls[0][0];
     expect(traceCall.level).toBe('silly'); // Winston uses silly for trace
     
-    logger.verbose('Verbose message');
+    log.verbose('Verbose message');
     const verboseCall = mockTransport.logMock.mock.calls[1][0];
     expect(verboseCall.level).toBe('verbose');
   });
@@ -135,14 +135,14 @@ describe('Winston Integration', () => {
       transports: [mockTransport]
     });
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => formattedLogger.info(...args)
       }
     });
     
-    logger.info('Formatted message');
+    log.info('Formatted message');
     
     const logCall = mockTransport.logMock.mock.calls[0][0];
     expect(logCall.timestamp).toBeDefined();

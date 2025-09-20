@@ -19,21 +19,24 @@ bun add log-lazy
 ## ⚡ Quick Start
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 
-const logger = new LazyLog({ level: 'info' });
-const log = logger.log; // ✨ Use the shorter syntax for cleaner code!
+const log = makeLog({ level: 'info' }); // ✨ Direct, simple, efficient!
 
-// Simple logging with the concise syntax
-log.info('Server started');
+// Preferred: Use log() directly (defaults to info level)
+log('Server started');
+log(() => `User ${user.id} logged in`); // With lazy evaluation
+
+// Also available: Explicit level methods
 log.debug('This will not be logged'); // Below info level
+log.error('An error occurred'); // Error level
 
 // 🚀 Make it efficient - just add () => to your template literals!
 log.debug(() => `Debug data: ${JSON.stringify(largeObject)}`); // Not evaluated!
-log.info(() => `User ${user.id} logged in`); // Evaluated and logged
+log(() => `Processing ${items.length} items`); // Evaluated and logged at info level
 ```
 
-**That's it!** You get shorter code (`log.info` vs `logger.info`) AND better performance!
+**That's it!** Simple, direct, and efficient!
 
 ## 🎯 The Problem This Solves
 
@@ -48,28 +51,28 @@ Traditional logging forces developers to either:
 ### ❌ Traditional Logging (Always Evaluates)
 ```javascript
 // This ALWAYS runs JSON.stringify, even when logging is disabled!
-logger.debug(`User data: ${JSON.stringify(user)}, Posts: ${JSON.stringify(posts)}`);
+log.debug(`User data: ${JSON.stringify(user)}, Posts: ${JSON.stringify(posts)}`);
 
 // This ALWAYS performs the calculation, even when logging is disabled!
-logger.debug(`Found ${users.filter(u => u.active).length} active users`);
+log.debug(`Found ${users.filter(u => u.active).length} active users`);
 
 // This ALWAYS builds the entire string, even when not logging!
-logger.info(`Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
+log.info(`Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
 ```
 
 ### ✅ Lazy Logging (Only Evaluates When Needed)
 ```javascript
-const logger = new LazyLog({ level: 'info' });
-const log = logger.log; // Use the shorter syntax - more concise!
+import makeLog from 'log-lazy';
+const log = makeLog({ level: 'info' }); // Direct and simple!
 
-// Just add () => to make it lazy! JSON.stringify only runs if debug is enabled
+// Preferred: Use log() for info-level logging
+log(() => `Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
+
+// For debug: JSON.stringify only runs if debug is enabled
 log.debug(() => `User data: ${JSON.stringify(user)}, Posts: ${JSON.stringify(posts)}`);
 
 // Calculation only happens if debug logging is enabled!
 log.debug(() => `Found ${users.filter(u => u.active).length} active users`);
-
-// Complex string building only happens when info is enabled!
-log.info(() => `Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
 ```
 
 The beauty is in the simplicity - just wrap your existing template literals with `() =>` and you get lazy evaluation!
@@ -79,22 +82,20 @@ The beauty is in the simplicity - just wrap your existing template literals with
 With lazy evaluation, you can keep detailed logging in production:
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 
-const logger = new LazyLog({ level: 'error' }); // Only errors in production
-const log = logger.log; // Use the shorter log() syntax
+const log = makeLog({ level: 'error' }); // Only errors in production
 
 function processOrder(order) {
   // These debug logs have ZERO performance impact in production!
-  // Just wrap template literals with () =>
   log.debug(() => `Processing order ${JSON.stringify(order)}`);
   log.debug(() => `Validation details: ${performExpensiveValidation(order)}`);
   
   try {
     const result = submitOrder(order);
     
-    // This also has zero cost when info is disabled
-    log.info(() => `Order #${result.id} submitted with ${result.items.length} items, total: $${result.calculateTotal()}`);
+    // Preferred: Use log() for info-level messages
+    log(() => `Order #${result.id} submitted with ${result.items.length} items, total: $${result.calculateTotal()}`);
     
     return result;
   } catch (error) {
@@ -110,10 +111,10 @@ function processOrder(order) {
 Log levels are bit flags that can be combined for fine-grained control:
 
 ```javascript
-const { LazyLog } = require('log-lazy');
+import makeLog, { levels } from 'log-lazy';
 
 // Standard levels (powers of 2)
-LazyLog.levels = {
+const logLevels = {
   none: 0,      // 0b00000000 - No logging
   fatal: 1,     // 0b00000001
   error: 2,     // 0b00000010
@@ -127,12 +128,12 @@ LazyLog.levels = {
 };
 
 // Combine levels with bitwise OR
-const customLevel = LazyLog.levels.error | LazyLog.levels.warn | LazyLog.levels.fatal;
-const log = new LazyLog({ level: customLevel });
+const customLevel = levels.error | levels.warn | levels.fatal;
+const log = makeLog({ level: customLevel });
 
 // Or use preset combinations
-const prodLog = new LazyLog({ level: 'production' }); // fatal, error, warn
-const devLog = new LazyLog({ level: 'development' });  // fatal, error, warn, info, debug
+const prodLog = makeLog({ level: 'production' }); // fatal, error, warn
+const devLog = makeLog({ level: 'development' });  // fatal, error, warn, info, debug
 ```
 
 ## 📖 API Usage
@@ -140,34 +141,33 @@ const devLog = new LazyLog({ level: 'development' });  // fatal, error, warn, in
 ### Basic Setup - Shorter & More Efficient
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 
-// Create logger and get the log function for the recommended shorter syntax
-const logger = new LazyLog({ level: 'info' });
-const log = logger.log; // ✨ Preferred: Shorter code = better readability!
+// Create log directly - clean and simple!
+const log = makeLog({ level: 'info' }); // ✨ That's it!
 
-// Clean, concise logging - just wrap template literals with () =>
-log.info(() => `Server started on port ${port}`);
+// Preferred: Use log() directly (defaults to info level)
+log(() => `Server started on port ${port}`);
+log(() => `Processing request: ${JSON.stringify(request)}`);
+
+// For other levels: Use explicit methods when needed
 log.error(() => `Failed to connect: ${error.message}`);
 log.debug(() => `State: ${JSON.stringify(state)}`); // Zero cost when disabled!
 
-// Why log.info() instead of logger.info()? 
-// → Shorter code + Same efficiency = Win-win! 🎯
+// Clean, direct API with zero overhead! 🎯
 ```
 
 ### Lazy Evaluation Examples
 
 ```javascript
-const logger = new LazyLog({ level: process.env.LOG_LEVEL || 'info' });
-const log = logger.log;
+const log = makeLog({ level: process.env.LOG_LEVEL || 'info' });
 
-// Simple: Just add () => before your template literals!
+// Preferred: Use log() with lazy evaluation
+log(() => `Processing order with ${items.length} items`);
+log(() => `Stats: ${calculateActiveUsers()} active users, revenue: $${calculateRevenue()}`);
+
+// For specific levels: Use explicit methods
 log.debug(() => `State snapshot: ${JSON.stringify(largeStateObject)}`);
-
-// Works with any expensive operation in template literals
-log.info(() => `Stats: ${calculateActiveUsers()} active users, revenue: $${calculateRevenue()}`);
-
-// Combine static and dynamic parts
 log.error(() => `Operation failed: ${error.message}
   Context: ${JSON.stringify(gatherContext())}
   State: ${JSON.stringify(captureState())}
@@ -181,25 +181,29 @@ log.trace(() => {
     Duration: ${result.duration}ms
     Memory used: ${result.memoryUsed}MB`;
 });
+
+// Note: log() is equivalent to log.info()
+// Both work, but log() is shorter and cleaner!
 ```
 
 ### Dynamic Level Control
 
 ```javascript
-const logger = new LazyLog({ level: LazyLog.levels.warn });
+import makeLog, { levels } from 'log-lazy';
+const log = makeLog({ level: levels.warn });
 
 // Enable specific levels at runtime
-logger.enableLevel('debug');
-logger.enableLevel('info');
+log.enableLevel('debug');
+log.enableLevel('info');
 
 // Disable specific levels
-logger.disableLevel('debug');
+log.disableLevel('debug');
 
 // Check what's enabled
-console.log(logger.getEnabledLevels()); // ['warn', 'info']
+console.log(log.getEnabledLevels()); // ['warn', 'info']
 
 // Check if a specific level would log
-if (logger.shouldLog('debug')) {
+if (log.shouldLog('debug')) {
   // Perform debug-only operations
 }
 ```
@@ -207,12 +211,12 @@ if (logger.shouldLog('debug')) {
 ### Custom Presets
 
 ```javascript
-const logger = new LazyLog({
+const log = makeLog({
   level: 'custom',
   presets: {
-    custom: LazyLog.levels.error | LazyLog.levels.debug,
-    minimal: LazyLog.levels.fatal | LazyLog.levels.error,
-    verbose: LazyLog.levels.all & ~LazyLog.levels.silly
+    custom: levels.error | levels.debug,
+    minimal: levels.fatal | levels.error,
+    verbose: levels.all & ~levels.silly
   }
 });
 ```
@@ -221,14 +225,14 @@ const logger = new LazyLog({
 
 ```javascript
 // Different loggers for different modules
-const dbLogger = new LazyLog({ level: 'error' });
-const apiLogger = new LazyLog({ level: 'info' });
-const authLogger = new LazyLog({ level: 'debug' });
+const dbLog = makeLog({ level: 'error' });
+const apiLog = makeLog({ level: 'info' });
+const authLog = makeLog({ level: 'debug' });
 
 // In production, update all to error-only
 if (process.env.NODE_ENV === 'production') {
-  [dbLogger, apiLogger, authLogger].forEach(logger => {
-    logger.level = LazyLog.levels.error;
+  [dbLog, apiLog, authLog].forEach(log => {
+    log.level = levels.error;
   });
 }
 ```
@@ -238,22 +242,23 @@ if (process.env.NODE_ENV === 'production') {
 ### 1. The Simple Rule: Just Add `() =>`
 
 ```javascript
-const log = logger.log; // Get the shorter syntax - more concise code!
+const log = makeLog({ level: 'info' });
 
 // ❌ Bad - Always evaluates
+log(`Found ${items.length} items worth $${calculateTotal(items)}`);
 log.debug(`Data: ${JSON.stringify(data)}`);
-log.info(`Found ${items.length} items worth $${calculateTotal(items)}`);
 
 // ✅ Good - Just add () => for lazy evaluation!
-log.debug(() => `Data: ${JSON.stringify(data)}`);
-log.info(() => `Found ${items.length} items worth $${calculateTotal(items)}`);
+log(() => `Found ${items.length} items worth $${calculateTotal(items)}`); // Preferred: log() for info
+log.debug(() => `Data: ${JSON.stringify(data)}`); // Use explicit level when needed
+
+// Remember: log() === log.info() - use the shorter one!
 ```
 
 ### 2. Keep Logging Statements in Production
 
 ```javascript
-const logger = new LazyLog({ level: process.env.LOG_LEVEL || 'error' });
-const log = logger.log;
+const log = makeLog({ level: process.env.LOG_LEVEL || 'error' });
 
 // You can now safely leave these in production code!
 function processPayment(payment) {
@@ -263,7 +268,8 @@ function processPayment(payment) {
   
   // Business logic...
   
-  log.info(() => `Payment ${payment.id} processed: $${payment.amount}, fees: $${calculateFees(payment)}`);
+  // Preferred: Use log() for info-level messages
+  log(() => `Payment ${payment.id} processed: $${payment.amount}, fees: $${calculateFees(payment)}`);
   
   if (payment.amount > 10000) {
     log.warn(() => `Large payment detected: ${payment.id} for $${payment.amount}`);
@@ -274,7 +280,7 @@ function processPayment(payment) {
 ### 3. Use Appropriate Levels
 
 ```javascript
-const log = logger.log; // Use the shorter syntax for cleaner code
+// Now use log.debug, log.info, etc.
 
 log.fatal('System is shutting down');          // System unusable
 log.error('Failed to save user', error);       // Error conditions
@@ -299,20 +305,19 @@ const getLogLevel = () => {
   }
 };
 
-const logger = new LazyLog({ level: getLogLevel() });
+const log = makeLog({ level: getLogLevel() });
 ```
 
 ## 🎯 Real-World Example
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 
 class OrderService {
   constructor() {
-    this.logger = new LazyLog({ 
+    this.log = makeLog({ 
       level: process.env.LOG_LEVEL || 'info' 
-    });
-    this.log = this.logger.log; // Shorter syntax
+    }); // Direct and clean!
   }
 
   async createOrder(orderData) {
@@ -331,7 +336,8 @@ class OrderService {
       // Create order
       const order = await this.saveOrder(orderData, payment);
       
-      this.log.info(() => `Order ${order.id} created successfully`);
+      // Preferred: Use log() for info-level messages
+      this.log(() => `Order ${order.id} created successfully`);
       
       // This expensive operation only runs if verbose is enabled
       this.log.verbose(() => `Order details: ${JSON.stringify(order.toDetailedJSON())}`);
@@ -355,7 +361,7 @@ class OrderService {
 ### Custom Output Functions
 
 ```javascript
-const logger = new LazyLog({
+const log = makeLog({
   level: 'all',
   log: {
     fatal: (msg) => alerting.critical(msg),
@@ -379,7 +385,7 @@ log-lazy can seamlessly integrate with existing logging libraries, adding lazy e
 The `debug` library is popular for its simplicity and namespace support:
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 import createDebug from 'debug';
 
 // Create debug instances for different namespaces
@@ -388,7 +394,7 @@ const debugDB = createDebug('app:db');
 const debugHTTP = createDebug('app:http');
 
 // Integrate with log-lazy
-const logger = new LazyLog({
+const log = makeLog({
   level: process.env.DEBUG ? 'all' : 'warn',
   log: {
     fatal: (...args) => debugApp('FATAL:', ...args),
@@ -402,7 +408,7 @@ const logger = new LazyLog({
   }
 });
 
-const log = logger.log; // Shorter syntax
+// Now use log.debug, log.info, etc.
 
 // Use with lazy evaluation
 log.debug('DB Query:', () => JSON.stringify(query));
@@ -418,7 +424,7 @@ log.verbose('HTTP Request:', () => ({
 Winston is a multi-transport async logging library:
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 import winston from 'winston';
 
 // Configure Winston
@@ -438,7 +444,7 @@ const winstonLogger = winston.createLogger({
 });
 
 // Integrate with log-lazy
-const logger = new LazyLog({
+const log = makeLog({
   level: 'all',
   log: {
     fatal: (...args) => winstonLogger.error('FATAL', ...args),
@@ -452,7 +458,7 @@ const logger = new LazyLog({
   }
 });
 
-const log = logger.log; // Shorter syntax
+// Now use log.debug, log.info, etc.
 
 // Lazy evaluation with Winston's metadata support
 log.info('User action', () => ({
@@ -467,7 +473,7 @@ log.info('User action', () => ({
 Log4js provides a familiar logging interface similar to Log4j:
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 import log4js from 'log4js';
 
 // Configure Log4js
@@ -487,7 +493,7 @@ const log4jsLogger = log4js.getLogger();
 const errorLogger = log4js.getLogger('errors');
 
 // Integrate with log-lazy
-const logger = new LazyLog({
+const log = makeLog({
   level: 'all',
   log: {
     fatal: (...args) => log4jsLogger.fatal(...args),
@@ -501,7 +507,7 @@ const logger = new LazyLog({
   }
 });
 
-const log = logger.log; // Shorter syntax
+// Now use log.debug, log.info, etc.
 
 // Use with lazy evaluation
 log.debug('Processing batch', () => ({
@@ -515,7 +521,7 @@ log.debug('Processing batch', () => ({
 Pino is an extremely fast Node.js logger with low overhead:
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 import pino from 'pino';
 
 // Configure Pino
@@ -530,7 +536,7 @@ const pinoLogger = pino({
 });
 
 // Integrate with log-lazy - Pino expects objects as first argument
-const logger = new LazyLog({
+const log = makeLog({
   level: 'all',
   log: {
     fatal: (...args) => {
@@ -568,7 +574,7 @@ const logger = new LazyLog({
   }
 });
 
-const log = logger.log; // Shorter syntax
+// Now use log.debug, log.info, etc.
 
 // Pino-friendly lazy evaluation
 log.info('Request completed', () => ({
@@ -583,7 +589,7 @@ log.info('Request completed', () => ({
 Bunyan provides structured JSON logging:
 
 ```javascript
-import { LazyLog } from 'log-lazy';
+import makeLog from 'log-lazy';
 import bunyan from 'bunyan';
 
 // Configure Bunyan
@@ -606,7 +612,7 @@ const bunyanLogger = bunyan.createLogger({
 const componentLogger = bunyanLogger.child({ component: 'api' });
 
 // Integrate with log-lazy
-const logger = new LazyLog({
+const log = makeLog({
   level: 'all',
   log: {
     fatal: (...args) => {
@@ -644,7 +650,7 @@ const logger = new LazyLog({
   }
 });
 
-const log = logger.log; // Shorter syntax
+// Now use log.debug, log.info, etc.
 
 // Bunyan-style structured logging with lazy evaluation
 log.error('Database error', () => ({
@@ -667,7 +673,7 @@ By integrating log-lazy with existing loggers, you get:
 ### Conditional Lazy Loading
 
 ```javascript
-const log = logger.log; // Shorter syntax for cleaner code
+// Now use log.debug, log.info, etc. for cleaner code
 
 // Only compute expensive debug info when actually debugging
 log.debug(() => {
@@ -694,8 +700,7 @@ console.timeEnd('traditional'); // ~500ms even when not logging!
 
 // Lazy logging with log-lazy
 console.time('lazy');
-const logger = new LazyLog({ level: 'error' }); // Debug disabled
-const log = logger.log;
+const log = makeLog({ level: 'error' }); // Debug disabled
 for(let i = 0; i < 1000000; i++) {
   // Just add () => and the function never executes since debug is disabled!
   log.debug(() => `Iteration ${i}: ${JSON.stringify({data: i, timestamp: Date.now()})}`);

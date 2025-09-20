@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
-import { LazyLog } from '../src/index.js';
+import makeLog from '../src/index.js';
 import bunyan from 'bunyan';
 import { Writable } from 'stream';
 
@@ -32,7 +32,7 @@ describe('Bunyan Integration', () => {
   });
   
   test('should integrate with Bunyan logger', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => {
@@ -70,7 +70,7 @@ describe('Bunyan Integration', () => {
       }
     });
     
-    logger.info('Test message');
+    log.info('Test message');
     expect(logOutput.length).toBe(1);
     expect(logOutput[0].msg).toBe('Test message');
     expect(logOutput[0].level).toBe(30); // Bunyan info level
@@ -78,7 +78,7 @@ describe('Bunyan Integration', () => {
   });
   
   test('should handle Bunyan structured logging with lazy evaluation', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => {
@@ -95,7 +95,7 @@ describe('Bunyan Integration', () => {
       timestamp: Date.now()
     }));
     
-    logger.info('User action', expensiveMetadata);
+    log.info('User action', expensiveMetadata);
     
     expect(expensiveMetadata).toHaveBeenCalled();
     expect(logOutput.length).toBe(1);
@@ -105,7 +105,7 @@ describe('Bunyan Integration', () => {
   });
   
   test('lazy evaluation should prevent execution when disabled', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'error', // Only error level
       log: {
         error: (...args) => {
@@ -121,18 +121,18 @@ describe('Bunyan Integration', () => {
     
     const expensiveFunc = mock(() => ({ data: 'expensive' }));
     
-    logger.info('Info message:', expensiveFunc);
+    log.info('Info message:', expensiveFunc);
     expect(expensiveFunc).not.toHaveBeenCalled();
     expect(logOutput.length).toBe(0);
     
-    logger.error('Error message:', expensiveFunc);
+    log.error('Error message:', expensiveFunc);
     expect(expensiveFunc).toHaveBeenCalled();
     expect(logOutput.length).toBe(1);
     expect(logOutput[0].level).toBe(50); // Bunyan error level
   });
   
   test('should map log levels correctly to Bunyan levels', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => bunyanLogger.fatal(args[0]),
@@ -144,29 +144,29 @@ describe('Bunyan Integration', () => {
       }
     });
     
-    logger.fatal('Fatal');
+    log.fatal('Fatal');
     expect(logOutput[0].level).toBe(60); // Bunyan fatal
     
-    logger.error('Error');
+    log.error('Error');
     expect(logOutput[1].level).toBe(50); // Bunyan error
     
-    logger.warn('Warn');
+    log.warn('Warn');
     expect(logOutput[2].level).toBe(40); // Bunyan warn
     
-    logger.info('Info');
+    log.info('Info');
     expect(logOutput[3].level).toBe(30); // Bunyan info
     
-    logger.debug('Debug');
+    log.debug('Debug');
     expect(logOutput[4].level).toBe(20); // Bunyan debug
     
-    logger.trace('Trace');
+    log.trace('Trace');
     expect(logOutput[5].level).toBe(10); // Bunyan trace
   });
   
   test('should work with Bunyan child loggers', () => {
     const childLogger = bunyanLogger.child({ component: 'api', version: '1.0.0' });
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => {
@@ -176,7 +176,7 @@ describe('Bunyan Integration', () => {
       }
     });
     
-    logger.info('API request', () => ({
+    log.info('API request', () => ({
       method: 'GET',
       path: '/users'
     }));
@@ -211,7 +211,7 @@ describe('Bunyan Integration', () => {
       }]
     });
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         error: (...args) => {
@@ -224,7 +224,7 @@ describe('Bunyan Integration', () => {
     const error = new Error('Test error');
     error.stack = 'Error: Test error\n    at test';
     
-    logger.error('Error occurred', () => ({ err: error }));
+    log.error('Error occurred', () => ({ err: error }));
     
     expect(logOutput.length).toBe(1);
     expect(logOutput[0].err).toBeDefined();

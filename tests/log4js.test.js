@@ -1,5 +1,5 @@
 import { describe, test, expect, mock } from 'bun:test';
-import { LazyLog } from '../src/index.js';
+import makeLog from '../src/index.js';
 
 describe('Log4js Integration', () => {
   test('should integrate with Log4js-style logging', () => {
@@ -13,7 +13,7 @@ describe('Log4js Integration', () => {
       trace: mock((...args) => {})
     };
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => mockLogger.fatal(...args),
@@ -27,10 +27,10 @@ describe('Log4js Integration', () => {
       }
     });
     
-    logger.info('Test message');
+    log.info('Test message');
     expect(mockLogger.info).toHaveBeenCalledWith('Test message');
     
-    logger.debug('Debug message');
+    log.debug('Debug message');
     expect(mockLogger.debug).toHaveBeenCalledWith('Debug message');
   });
   
@@ -39,7 +39,7 @@ describe('Log4js Integration', () => {
       debug: mock((...args) => {})
     };
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         debug: (...args) => mockLogger.debug(...args)
@@ -51,7 +51,7 @@ describe('Log4js Integration', () => {
       timestamp: Date.now()
     }));
     
-    logger.debug('Debug data:', expensiveFunc);
+    log.debug('Debug data:', expensiveFunc);
     
     expect(expensiveFunc).toHaveBeenCalled();
     expect(mockLogger.debug).toHaveBeenCalled();
@@ -65,7 +65,7 @@ describe('Log4js Integration', () => {
       debug: mock((...args) => {})
     };
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'error', // Only error level
       log: {
         error: (...args) => mockLogger.error(...args),
@@ -75,11 +75,11 @@ describe('Log4js Integration', () => {
     
     const expensiveFunc = mock(() => 'expensive result');
     
-    logger.debug('Debug message:', expensiveFunc);
+    log.debug('Debug message:', expensiveFunc);
     expect(expensiveFunc).not.toHaveBeenCalled();
     expect(mockLogger.debug).not.toHaveBeenCalled();
     
-    logger.error('Error message:', expensiveFunc);
+    log.error('Error message:', expensiveFunc);
     expect(expensiveFunc).toHaveBeenCalled();
     expect(mockLogger.error).toHaveBeenCalled();
   });
@@ -92,7 +92,7 @@ describe('Log4js Integration', () => {
       error: mock((...args) => {})
     };
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         error: (...args) => errorLogger.error(...args),
@@ -100,10 +100,10 @@ describe('Log4js Integration', () => {
       }
     });
     
-    logger.info('Info message');
+    log.info('Info message');
     expect(defaultLogger.info).toHaveBeenCalledWith('Info message');
     
-    logger.error('Error message');
+    log.error('Error message');
     expect(errorLogger.error).toHaveBeenCalledWith('Error message');
   });
   
@@ -112,7 +112,7 @@ describe('Log4js Integration', () => {
       trace: mock((...args) => {})
     };
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         verbose: (...args) => mockLogger.trace(...args),
@@ -120,10 +120,10 @@ describe('Log4js Integration', () => {
       }
     });
     
-    logger.verbose('Verbose message');
+    log.verbose('Verbose message');
     expect(mockLogger.trace).toHaveBeenCalledWith('Verbose message');
     
-    logger.silly('Silly message');
+    log.silly('Silly message');
     expect(mockLogger.trace.mock.calls[1][0]).toBe('SILLY:');
     expect(mockLogger.trace.mock.calls[1][1]).toBe('Silly message');
   });

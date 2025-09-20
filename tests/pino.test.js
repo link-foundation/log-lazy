@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, mock } from 'bun:test';
-import { LazyLog } from '../src/index.js';
+import makeLog from '../src/index.js';
 import pino from 'pino';
 import { Writable } from 'stream';
 
@@ -28,7 +28,7 @@ describe('Pino Integration', () => {
   });
   
   test('should integrate with Pino logger', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => {
@@ -66,14 +66,14 @@ describe('Pino Integration', () => {
       }
     });
     
-    logger.info('Test message');
+    log.info('Test message');
     expect(logOutput.length).toBe(1);
     expect(logOutput[0].msg).toBe('Test message');
     expect(logOutput[0].level).toBe(30); // Pino info level
   });
   
   test('should handle Pino structured logging with lazy evaluation', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => {
@@ -90,7 +90,7 @@ describe('Pino Integration', () => {
       timestamp: Date.now()
     }));
     
-    logger.info('User action', expensiveMetadata);
+    log.info('User action', expensiveMetadata);
     
     expect(expensiveMetadata).toHaveBeenCalled();
     expect(logOutput.length).toBe(1);
@@ -100,7 +100,7 @@ describe('Pino Integration', () => {
   });
   
   test('lazy evaluation should prevent execution when disabled', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'error', // Only error level
       log: {
         error: (...args) => {
@@ -116,18 +116,18 @@ describe('Pino Integration', () => {
     
     const expensiveFunc = mock(() => ({ data: 'expensive' }));
     
-    logger.info('Info message:', expensiveFunc);
+    log.info('Info message:', expensiveFunc);
     expect(expensiveFunc).not.toHaveBeenCalled();
     expect(logOutput.length).toBe(0);
     
-    logger.error('Error message:', expensiveFunc);
+    log.error('Error message:', expensiveFunc);
     expect(expensiveFunc).toHaveBeenCalled();
     expect(logOutput.length).toBe(1);
     expect(logOutput[0].level).toBe(50); // Pino error level
   });
   
   test('should map log levels correctly to Pino levels', () => {
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         fatal: (...args) => {
@@ -157,29 +157,29 @@ describe('Pino Integration', () => {
       }
     });
     
-    logger.fatal('Fatal');
+    log.fatal('Fatal');
     expect(logOutput[0].level).toBe(60); // Pino fatal
     
-    logger.error('Error');
+    log.error('Error');
     expect(logOutput[1].level).toBe(50); // Pino error
     
-    logger.warn('Warn');
+    log.warn('Warn');
     expect(logOutput[2].level).toBe(40); // Pino warn
     
-    logger.info('Info');
+    log.info('Info');
     expect(logOutput[3].level).toBe(30); // Pino info
     
-    logger.debug('Debug');
+    log.debug('Debug');
     expect(logOutput[4].level).toBe(20); // Pino debug
     
-    logger.trace('Trace');
+    log.trace('Trace');
     expect(logOutput[5].level).toBe(10); // Pino trace
   });
   
   test('should work with Pino child loggers', () => {
     const childLogger = pinoLogger.child({ component: 'api' });
     
-    const logger = new LazyLog({
+    const log = makeLog({
       level: 'all',
       log: {
         info: (...args) => {
@@ -189,7 +189,7 @@ describe('Pino Integration', () => {
       }
     });
     
-    logger.info('API request', () => ({
+    log.info('API request', () => ({
       method: 'GET',
       path: '/users'
     }));

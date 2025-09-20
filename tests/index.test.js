@@ -1,7 +1,45 @@
 import { describe, test, expect, beforeEach, afterEach, mock, spyOn } from 'bun:test';
-import { LazyLog, LazyLogger, Logger, defaultLogger, defaultLog, log } from '../src/index.js';
+import makeLog, { defaultLog, log, levels, levelNames } from '../src/index.js';
 
-describe('LazyLog', () => {
+// Helper to create LazyLog-compatible object from makeLog
+const createCompatibleLogger = (options) => {
+  const logObj = makeLog(options);
+  const logger = { 
+    log: logObj,
+    fatal: logObj.fatal,
+    error: logObj.error,
+    warn: logObj.warn,
+    info: logObj.info,
+    debug: logObj.debug,
+    verbose: logObj.verbose,
+    trace: logObj.trace,
+    silly: logObj.silly,
+    shouldLog: logObj.shouldLog,
+    enableLevel: logObj.enableLevel,
+    disableLevel: logObj.disableLevel,
+    getEnabledLevels: logObj.getEnabledLevels,
+    levels: logObj.levels,
+    levelNames: logObj.levelNames
+  };
+  Object.defineProperty(logger, 'level', {
+    get: () => logObj.level,
+    set: (v) => { logObj.level = v; }
+  });
+  // For tests that check externalLog
+  logger.externalLog = options?.log || {
+    fatal: console.error,
+    error: console.error,
+    warn: console.warn,
+    info: console.log,
+    debug: console.log,
+    verbose: console.log,
+    trace: console.log,
+    silly: console.log
+  };
+  return logger;
+};
+
+describe('makeLog (LazyLog compatibility)', () => {
   let consoleErrorSpy, consoleWarnSpy, consoleLogSpy;
   let logger;
 
@@ -9,7 +47,26 @@ describe('LazyLog', () => {
     consoleErrorSpy = spyOn(console, 'error').mockImplementation(() => {});
     consoleWarnSpy = spyOn(console, 'warn').mockImplementation(() => {});
     consoleLogSpy = spyOn(console, 'log').mockImplementation(() => {});
-    logger = new LazyLog();
+    logger = { log: makeLog(), ...makeLog() };
+    // Add compatibility methods
+    logger.fatal = logger.log.fatal;
+    logger.error = logger.log.error;
+    logger.warn = logger.log.warn;
+    logger.info = logger.log.info;
+    logger.debug = logger.log.debug;
+    logger.verbose = logger.log.verbose;
+    logger.trace = logger.log.trace;
+    logger.silly = logger.log.silly;
+    logger.shouldLog = logger.log.shouldLog;
+    logger.enableLevel = logger.log.enableLevel;
+    logger.disableLevel = logger.log.disableLevel;
+    logger.getEnabledLevels = logger.log.getEnabledLevels;
+    logger.levels = logger.log.levels;
+    logger.levelNames = logger.log.levelNames;
+    Object.defineProperty(logger, 'level', {
+      get: () => logger.log.level,
+      set: (v) => { logger.log.level = v; }
+    });
   });
   
   afterEach(() => {
@@ -20,67 +77,67 @@ describe('LazyLog', () => {
 
   describe('Static levels', () => {
     test('should have correct static level values', () => {
-      expect(LazyLog.levels.none).toBe(0);
-      expect(LazyLog.levels.fatal).toBe(1);
-      expect(LazyLog.levels.error).toBe(2);
-      expect(LazyLog.levels.warn).toBe(4);
-      expect(LazyLog.levels.info).toBe(8);
-      expect(LazyLog.levels.debug).toBe(16);
-      expect(LazyLog.levels.verbose).toBe(32);
-      expect(LazyLog.levels.trace).toBe(64);
-      expect(LazyLog.levels.silly).toBe(128);
-      expect(LazyLog.levels.all).toBe(255);
+      expect(levels.none).toBe(0);
+      expect(levels.fatal).toBe(1);
+      expect(levels.error).toBe(2);
+      expect(levels.warn).toBe(4);
+      expect(levels.info).toBe(8);
+      expect(levels.debug).toBe(16);
+      expect(levels.verbose).toBe(32);
+      expect(levels.trace).toBe(64);
+      expect(levels.silly).toBe(128);
+      expect(levels.all).toBe(255);
     });
   });
 
   describe('Constructor', () => {
     test('should initialize with default info level', () => {
-      const logger = new LazyLog();
-      expect(logger.level).toBe(LazyLog.levels.info);
+      const logger = createCompatibleLogger();
+      expect(logger.level).toBe(levels.info);
     });
 
     test('should initialize with custom level from options', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.debug });
-      expect(logger.level).toBe(LazyLog.levels.debug);
+      const logger = createCompatibleLogger({ level: levels.debug });
+      expect(logger.level).toBe(levels.debug);
     });
 
     test('should parse string level names', () => {
-      const logger = new LazyLog({ level: 'debug' });
-      expect(logger.level).toBe(LazyLog.levels.debug);
+      const logger = createCompatibleLogger({ level: 'debug' });
+      expect(logger.level).toBe(levels.debug);
     });
 
     test('should parse numeric string levels', () => {
-      const logger = new LazyLog({ level: '16' });
+      const logger = createCompatibleLogger({ level: '16' });
       expect(logger.level).toBe(16);
     });
 
     test('should default to info for invalid string levels', () => {
-      const logger = new LazyLog({ level: 'invalid' });
-      expect(logger.level).toBe(LazyLog.levels.info);
+      const logger = createCompatibleLogger({ level: 'invalid' });
+      expect(logger.level).toBe(levels.info);
     });
 
     test('should set default production preset', () => {
-      const logger = new LazyLog();
+      const logger = createCompatibleLogger();
       expect(logger.levels.production).toBe(7); // fatal + error + warn
     });
 
     test('should set default development preset', () => {
-      const logger = new LazyLog();
+      const logger = createCompatibleLogger();
       expect(logger.levels.development).toBe(31); // fatal + error + warn + info + debug
     });
 
     test('should allow custom production preset', () => {
-      const logger = new LazyLog({ presets: { production: 15 } });
+      const logger = createCompatibleLogger({ presets: { production: 15 } });
       expect(logger.levels.production).toBe(15);
     });
 
     test('should allow custom development preset', () => {
-      const logger = new LazyLog({ presets: { development: 63 } });
+      const logger = createCompatibleLogger({ presets: { development: 63 } });
       expect(logger.levels.development).toBe(63);
     });
 
     test('should allow additional custom presets', () => {
-      const logger = new LazyLog({ presets: { custom: 100, testing: 200 } });
+      const logger = createCompatibleLogger({ presets: { custom: 100, testing: 200 } });
       expect(logger.levels.custom).toBe(100);
       expect(logger.levels.testing).toBe(200);
     });
@@ -95,8 +152,8 @@ describe('LazyLog', () => {
       const customTrace = mock(() => {});
       const customSilly = mock(() => {});
 
-      const logger = new LazyLog({
-        level: LazyLog.levels.all,
+      const logger = createCompatibleLogger({
+        level: levels.all,
         log: {
           fatal: customFatal,
           error: customError,
@@ -137,31 +194,31 @@ describe('LazyLog', () => {
 
   describe('shouldLog', () => {
     test('should return false when level is none', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.none });
+      const logger = createCompatibleLogger({ level: levels.none });
       expect(logger.shouldLog('fatal')).toBe(false);
       expect(logger.shouldLog('error')).toBe(false);
       expect(logger.shouldLog('info')).toBe(false);
     });
 
     test('should return true for enabled levels', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error | LazyLog.levels.warn });
+      const logger = createCompatibleLogger({ level: levels.error | levels.warn });
       expect(logger.shouldLog('error')).toBe(true);
       expect(logger.shouldLog('warn')).toBe(true);
     });
 
     test('should return false for disabled levels', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error | LazyLog.levels.warn });
+      const logger = createCompatibleLogger({ level: levels.error | levels.warn });
       expect(logger.shouldLog('info')).toBe(false);
       expect(logger.shouldLog('debug')).toBe(false);
     });
 
     test('should return false for invalid level names', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       expect(logger.shouldLog('invalid')).toBe(false);
     });
 
     test('should work with numeric level values', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       expect(logger.shouldLog(1)).toBe(true); // fatal
       expect(logger.shouldLog(2)).toBe(true); // error
       expect(logger.shouldLog(4)).toBe(true); // warn
@@ -170,7 +227,7 @@ describe('LazyLog', () => {
 
   describe('Logging methods', () => {
     beforeEach(() => {
-      logger = new LazyLog({ level: LazyLog.levels.all });
+      logger = createCompatibleLogger({ level: levels.all });
     });
 
     test('log() should default to info level', () => {
@@ -221,7 +278,7 @@ describe('LazyLog', () => {
 
   describe('Backward compatibility methods', () => {
     beforeEach(() => {
-      logger = new LazyLog({ level: LazyLog.levels.all });
+      logger = createCompatibleLogger({ level: levels.all });
     });
 
     test('fatal() method should work', () => {
@@ -267,7 +324,7 @@ describe('LazyLog', () => {
 
   describe('Lazy evaluation', () => {
     test('should evaluate function arguments when logging', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       const lazyFn = mock(() => 'lazy value');
       
       logger.info('message', lazyFn);
@@ -276,7 +333,7 @@ describe('LazyLog', () => {
     });
 
     test('should not evaluate function arguments when not logging', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.none });
+      const logger = createCompatibleLogger({ level: levels.none });
       const lazyFn = mock(() => 'lazy value');
       
       logger.info('message', lazyFn);
@@ -285,7 +342,7 @@ describe('LazyLog', () => {
     });
 
     test('should handle function evaluation errors', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       const errorFn = () => {
         throw new Error('evaluation error');
       };
@@ -298,7 +355,7 @@ describe('LazyLog', () => {
     });
 
     test('should handle multiple function arguments', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       const fn1 = mock(() => 'value1');
       const fn2 = mock(() => 'value2');
       const fn3 = mock(() => 'value3');
@@ -313,7 +370,7 @@ describe('LazyLog', () => {
 
   describe('Level filtering', () => {
     test('should not log when level is disabled', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error });
+      const logger = createCompatibleLogger({ level: levels.error });
       
       logger.info('should not appear');
       logger.debug('should not appear');
@@ -323,7 +380,7 @@ describe('LazyLog', () => {
     });
 
     test('should log when level is enabled', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error | LazyLog.levels.warn });
+      const logger = createCompatibleLogger({ level: levels.error | levels.warn });
       
       logger.error('should appear');
       logger.warn('should appear');
@@ -333,7 +390,7 @@ describe('LazyLog', () => {
     });
 
     test('should respect combined level masks', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.production });
+      const logger = createCompatibleLogger({ level: levels.production });
       
       logger.fatal('yes');
       logger.error('yes');
@@ -349,48 +406,48 @@ describe('LazyLog', () => {
 
   describe('enableLevel and disableLevel', () => {
     test('enableLevel should add a level to the mask', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.none });
+      const logger = createCompatibleLogger({ level: levels.none });
       
       logger.enableLevel('error');
-      expect(logger.level).toBe(LazyLog.levels.error);
+      expect(logger.level).toBe(levels.error);
       
       logger.enableLevel('warn');
-      expect(logger.level).toBe(LazyLog.levels.error | LazyLog.levels.warn);
+      expect(logger.level).toBe(levels.error | levels.warn);
     });
 
     test('disableLevel should remove a level from the mask', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       
       logger.disableLevel('silly');
-      expect(logger.level).toBe(LazyLog.levels.all & ~LazyLog.levels.silly);
+      expect(logger.level).toBe(levels.all & ~levels.silly);
       
       logger.disableLevel('trace');
-      expect(logger.level).toBe(LazyLog.levels.all & ~LazyLog.levels.silly & ~LazyLog.levels.trace);
+      expect(logger.level).toBe(levels.all & ~levels.silly & ~levels.trace);
     });
 
     test('enableLevel with invalid level should not change mask', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error });
+      const logger = createCompatibleLogger({ level: levels.error });
       
       logger.enableLevel('invalid');
-      expect(logger.level).toBe(LazyLog.levels.error);
+      expect(logger.level).toBe(levels.error);
     });
 
     test('disableLevel with invalid level should not change mask', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error });
+      const logger = createCompatibleLogger({ level: levels.error });
       
       logger.disableLevel('invalid');
-      expect(logger.level).toBe(LazyLog.levels.error);
+      expect(logger.level).toBe(levels.error);
     });
 
     test('enableLevel with numeric level should work', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.none });
+      const logger = createCompatibleLogger({ level: levels.none });
       
       logger.enableLevel(2); // error level
       expect(logger.level).toBe(2);
     });
 
     test('disableLevel with numeric level should work', () => {
-      const logger = new LazyLog({ level: 7 }); // fatal + error + warn
+      const logger = createCompatibleLogger({ level: 7 }); // fatal + error + warn
       
       logger.disableLevel(2); // error level
       expect(logger.level).toBe(5); // fatal + warn
@@ -399,43 +456,43 @@ describe('LazyLog', () => {
 
   describe('getEnabledLevels', () => {
     test('should return empty array when no levels are enabled', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.none });
+      const logger = createCompatibleLogger({ level: levels.none });
       expect(logger.getEnabledLevels()).toEqual([]);
     });
 
     test('should return all levels when all are enabled', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       expect(logger.getEnabledLevels()).toEqual([
         'fatal', 'error', 'warn', 'info', 'debug', 'verbose', 'trace', 'silly'
       ]);
     });
 
     test('should return only enabled levels', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.error | LazyLog.levels.warn | LazyLog.levels.info });
+      const logger = createCompatibleLogger({ level: levels.error | levels.warn | levels.info });
       expect(logger.getEnabledLevels()).toEqual(['error', 'warn', 'info']);
     });
 
     test('should return production levels correctly', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.production });
+      const logger = createCompatibleLogger({ level: levels.production });
       expect(logger.getEnabledLevels()).toEqual(['fatal', 'error', 'warn']);
     });
 
     test('should return development levels correctly', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.development });
+      const logger = createCompatibleLogger({ level: levels.development });
       expect(logger.getEnabledLevels()).toEqual(['fatal', 'error', 'warn', 'info', 'debug']);
     });
   });
 
   describe('Multiple arguments', () => {
     test('should handle multiple arguments', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       
       logger.info('arg1', 'arg2', 'arg3', 123, { key: 'value' });
       expect(consoleLogSpy).toHaveBeenCalledWith('arg1', 'arg2', 'arg3', 123, { key: 'value' });
     });
 
     test('should handle mix of static and lazy arguments', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       const lazyFn = () => 'lazy';
       
       logger.info('static1', lazyFn, 'static2');
@@ -445,21 +502,21 @@ describe('LazyLog', () => {
 
   describe('Edge cases', () => {
     test('should handle logging with no arguments', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       
       logger.info();
       expect(consoleLogSpy).toHaveBeenCalledWith();
     });
 
     test('should handle undefined and null arguments', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       
       logger.info(undefined, null, 'test');
       expect(consoleLogSpy).toHaveBeenCalledWith(undefined, null, 'test');
     });
     
     test('should not fall back to console.log for unknown levels', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       
       // Try to log with an invalid numeric level that doesn't exist
       // This tests that there's no fallback - it should not log anything
@@ -481,8 +538,8 @@ describe('LazyLog', () => {
       const customInfo = mock(() => {});
       const customError = mock(() => {});
       
-      const logger = new LazyLog({ 
-        level: LazyLog.levels.all,
+      const logger = createCompatibleLogger({ 
+        level: levels.all,
         log: {
           info: customInfo,
           error: customError
@@ -500,7 +557,7 @@ describe('LazyLog', () => {
     });
 
     test('should handle all standard log levels correctly', () => {
-      const logger = new LazyLog({ level: LazyLog.levels.all });
+      const logger = createCompatibleLogger({ level: levels.all });
       
       // Test that all valid levels work correctly
       logger.log.fatal('test');
@@ -518,8 +575,8 @@ describe('LazyLog', () => {
     });
 
     test('should handle custom combined levels', () => {
-      const customLevel = LazyLog.levels.error | LazyLog.levels.debug | LazyLog.levels.silly;
-      const logger = new LazyLog({ level: customLevel });
+      const customLevel = levels.error | levels.debug | levels.silly;
+      const logger = createCompatibleLogger({ level: customLevel });
       
       logger.fatal('no');
       logger.error('yes');
@@ -537,36 +594,126 @@ describe('LazyLog', () => {
   });
 
   describe('Exports', () => {
-    test('should export LazyLog as default', () => {
-      expect(LazyLog).toBeDefined();
-      expect(LazyLog).toBe(Logger);
-      expect(LazyLog).toBe(LazyLogger);
+    test('should export makeLog as default', () => {
+      expect(makeLog).toBeDefined();
+      expect(typeof makeLog).toBe('function');
     });
 
-    test('should export defaultLogger instance', () => {
-      expect(defaultLogger).toBeDefined();
-      expect(defaultLogger).toBeInstanceOf(LazyLog);
-      expect(defaultLog).toBe(defaultLogger);
+    test('should export defaultLog instance', () => {
+      expect(defaultLog).toBeDefined();
+      expect(typeof defaultLog).toBe('function');
+      expect(typeof defaultLog.info).toBe('function');
     });
 
-    test('should export log function', () => {
+    test('should export log as alias to defaultLog', () => {
       expect(log).toBeDefined();
-      expect(typeof log).toBe('function');
-      expect(log).toBe(defaultLogger.log);
+      expect(log).toBe(defaultLog);
     });
 
-    test('defaultLogger should work correctly', () => {
-      // Verify that defaultLogger is properly instantiated
-      expect(defaultLogger).toBeInstanceOf(LazyLog);
-      expect(defaultLogger.level).toBe(LazyLog.levels.info);
+    test('should export levels and levelNames', () => {
+      expect(levels).toBeDefined();
+      expect(levels.info).toBe(8);
+      expect(levelNames).toBeDefined();
+      expect(levelNames[8]).toBe('info');
+    });
+
+    test('defaultLog should work correctly', () => {
+      // Verify that defaultLog is properly instantiated
+      expect(defaultLog.level).toBe(levels.info);
       
       // Test that it can log (we can't test the actual console output 
-      // since defaultLogger captures console at import time)
-      expect(() => defaultLogger.info('test')).not.toThrow();
+      // since defaultLog captures console at import time)
+      expect(() => defaultLog.info('test')).not.toThrow();
       
       // Verify shouldLog works
-      expect(defaultLogger.shouldLog('info')).toBe(true);
-      expect(defaultLogger.shouldLog('debug')).toBe(false);
+      expect(defaultLog.shouldLog('info')).toBe(true);
+      expect(defaultLog.shouldLog('debug')).toBe(false);
     });
+  });
+});
+
+describe('makeLog', () => {
+  let consoleErrorSpy, consoleWarnSpy, consoleLogSpy;
+  
+  beforeEach(() => {
+    consoleErrorSpy = spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = spyOn(console, 'warn').mockImplementation(() => {});
+    consoleLogSpy = spyOn(console, 'log').mockImplementation(() => {});
+  });
+  
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
+    consoleLogSpy.mockRestore();
+  });
+  
+  test('should create a log function directly', () => {
+    const log = makeLog({ level: 'info' });
+    expect(typeof log).toBe('function');
+    expect(typeof log.info).toBe('function');
+    expect(typeof log.debug).toBe('function');
+    expect(typeof log.error).toBe('function');
+  });
+  
+  test('should log messages at appropriate levels', () => {
+    const log = makeLog({ level: levels.info | levels.error }); // Need both bits
+    
+    log.info('info message');
+    log.debug('debug message'); // should not log
+    log.error('error message');
+    
+    expect(consoleLogSpy).toHaveBeenCalledWith('info message');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('error message');
+    expect(consoleLogSpy).toHaveBeenCalledTimes(1); // debug not logged
+  });
+  
+  test('should support level property setter', () => {
+    const log = makeLog({ level: 'error' });
+    
+    log.info('should not log');
+    expect(consoleLogSpy).not.toHaveBeenCalled();
+    
+    log.level = 'info';
+    log.info('should log');
+    expect(consoleLogSpy).toHaveBeenCalledWith('should log');
+  });
+  
+  test('should have utility methods', () => {
+    const log = makeLog({ level: 'warn' });
+    
+    expect(log.shouldLog('warn')).toBe(true);
+    expect(log.shouldLog('error')).toBe(false); // error is separate bit
+    expect(log.shouldLog('info')).toBe(false);
+    
+    log.enableLevel('info');
+    log.enableLevel('error');
+    expect(log.shouldLog('info')).toBe(true);
+    expect(log.shouldLog('error')).toBe(true);
+    
+    log.disableLevel('warn');
+    expect(log.shouldLog('warn')).toBe(false);
+    
+    const enabled = log.getEnabledLevels();
+    expect(enabled).toContain('error');
+    expect(enabled).toContain('info');
+    expect(enabled).not.toContain('warn');
+  });
+  
+  test('should support lazy evaluation with template literals', () => {
+    const log = makeLog({ level: 'info' });
+    const expensiveOperation = mock(() => 'expensive result');
+    
+    log.debug(() => `Debug: ${expensiveOperation()}`);
+    expect(expensiveOperation).not.toHaveBeenCalled();
+    
+    log.info(() => `Info: ${expensiveOperation()}`);
+    expect(expensiveOperation).toHaveBeenCalled();
+    expect(consoleLogSpy).toHaveBeenCalledWith('Info: expensive result');
+  });
+  
+  test('should have access to levels and levelNames', () => {
+    expect(levels.info).toBe(8);
+    expect(levels.debug).toBe(16);
+    expect(levelNames[8]).toBe('info');
   });
 });
