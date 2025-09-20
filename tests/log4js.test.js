@@ -5,12 +5,12 @@ describe('Log4js Integration', () => {
   test('should integrate with Log4js-style logging', () => {
     // Mock log4js-style logger
     const mockLogger = {
-      fatal: mock((...args) => {}),
-      error: mock((...args) => {}),
-      warn: mock((...args) => {}),
-      info: mock((...args) => {}),
-      debug: mock((...args) => {}),
-      trace: mock((...args) => {})
+      fatal: mock((..._args) => {}),
+      error: mock((..._args) => {}),
+      warn: mock((..._args) => {}),
+      info: mock((..._args) => {}),
+      debug: mock((..._args) => {}),
+      trace: mock((..._args) => {})
     };
     
     const log = makeLog({
@@ -36,7 +36,7 @@ describe('Log4js Integration', () => {
   
   test('should handle lazy evaluation with Log4js-style logging', () => {
     const mockLogger = {
-      debug: mock((...args) => {})
+      debug: mock((..._args) => {})
     };
     
     const log = makeLog({
@@ -61,8 +61,8 @@ describe('Log4js Integration', () => {
   
   test('lazy evaluation should prevent execution when disabled', () => {
     const mockLogger = {
-      error: mock((...args) => {}),
-      debug: mock((...args) => {})
+      error: mock((..._args) => {}),
+      debug: mock((..._args) => {})
     };
     
     const log = makeLog({
@@ -86,10 +86,10 @@ describe('Log4js Integration', () => {
   
   test('should work with Log4js-style categories simulation', () => {
     const defaultLogger = {
-      info: mock((...args) => {})
+      info: mock((..._args) => {})
     };
     const errorLogger = {
-      error: mock((...args) => {})
+      error: mock((..._args) => {})
     };
     
     const log = makeLog({
@@ -109,7 +109,7 @@ describe('Log4js Integration', () => {
   
   test('should map verbose and silly to trace level', () => {
     const mockLogger = {
-      trace: mock((...args) => {})
+      trace: mock((..._args) => {})
     };
     
     const log = makeLog({

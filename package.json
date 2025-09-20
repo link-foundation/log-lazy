@@ -8,6 +8,8 @@
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
     "bench": "bun run benchmarks/lazy-vs-traditional.bench.js && bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
     "bench:lazy": "bun run benchmarks/lazy-vs-traditional.bench.js",
     "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
@@ -45,9 +47,11 @@
     "access": "public"
   },
   "devDependencies": {
+    "@eslint/js": "^9.36.0",
     "@types/bun": "^1.1.13",
     "bunyan": "^1.8.15",
     "debug": "^4.3.4",
+    "eslint": "9",
     "log4js": "^6.9.1",
     "mitata": "^1.0.34",
     "pino": "^8.16.2",

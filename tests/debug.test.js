@@ -4,9 +4,9 @@ import makeLog from '../src/index.js';
 describe('Debug Integration', () => {
   test('should integrate with debug-style library', () => {
     // Mock debug-style function
-    const mockDebug = mock((...args) => {});
-    const mockDebugDB = mock((...args) => {});
-    const mockDebugHTTP = mock((...args) => {});
+    const mockDebug = mock((..._args) => {});
+    const mockDebugDB = mock((..._args) => {});
+    const mockDebugHTTP = mock((..._args) => {});
     
     const log = makeLog({
       level: 'all',
@@ -36,7 +36,7 @@ describe('Debug Integration', () => {
   });
   
   test('should handle lazy evaluation', () => {
-    const mockDebug = mock((...args) => {});
+    const mockDebug = mock((..._args) => {});
     
     const log = makeLog({
       level: 'all',
@@ -53,7 +53,7 @@ describe('Debug Integration', () => {
   });
   
   test('lazy evaluation should not execute when disabled', () => {
-    const mockDebug = mock((...args) => {});
+    const mockDebug = mock((..._args) => {});
     
     const log = makeLog({
       level: 'none', // Disable all logging
@@ -73,7 +73,7 @@ describe('Debug Integration', () => {
   });
   
   test('should handle complex objects', () => {
-    const mockDebug = mock((...args) => {});
+    const mockDebug = mock((..._args) => {});
     
     const log = makeLog({
       level: 'all',
@@ -95,9 +95,9 @@ describe('Debug Integration', () => {
   
   test('should work with namespace simulation', () => {
     const namespaces = {
-      'app': mock((...args) => {}),
-      'app:db': mock((...args) => {}),
-      'app:http': mock((...args) => {})
+      'app': mock((..._args) => {}),
+      'app:db': mock((..._args) => {}),
+      'app:http': mock((..._args) => {})
     };
     
     const log = makeLog({

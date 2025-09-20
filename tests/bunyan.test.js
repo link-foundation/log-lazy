@@ -16,7 +16,7 @@ describe('Bunyan Integration', () => {
         try {
           const log = JSON.parse(chunk.toString());
           logOutput.push(log);
-        } catch (e) {
+        } catch (_e) {
           // Handle non-JSON output
           logOutput.push(chunk.toString());
         }
@@ -202,7 +202,7 @@ describe('Bunyan Integration', () => {
             try {
               const log = JSON.parse(chunk.toString());
               logOutput.push(log);
-            } catch (e) {
+            } catch (_e) {
               logOutput.push(chunk.toString());
             }
             callback();

@@ -123,6 +123,11 @@ jobs:
       - name: Install dependencies
         run: bun install
       
+      - name: Run ESLint
+        run: |
+          echo "Running ESLint..."
+          bun run lint
+      
       - name: Check for console.log statements
         run: |
           # Check for console.log in source files (excluding tests and benchmarks)
