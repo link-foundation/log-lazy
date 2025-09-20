@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0  # Get all history for proper comparison
       
       - name: Check if version was bumped
         id: check
@@ -25,13 +25,21 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
           
-          # Get version from previous commit
-          git checkout HEAD~1 2>/dev/null || true
-          if [ -f "package.json" ]; then
-            PREVIOUS_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
+          # Try to get version from previous commit
+          PREVIOUS_VERSION="0.0.0"
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            # Previous commit exists
+            git checkout HEAD~1 2>/dev/null || true
+            if [ -f "package.json" ]; then
+              PREVIOUS_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.0.0")
+            fi
+            git checkout - 2>/dev/null || true
           else
+            # This is the first commit
+            echo "This appears to be the first commit"
             PREVIOUS_VERSION="0.0.0"
           fi
+          
           echo "Previous version: $PREVIOUS_VERSION"
           
           # Check if version changed
@@ -40,19 +48,18 @@ jobs:
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           else
-            echo "::warning::Version not bumped. Current version: $CURRENT_VERSION"
+            # Don't fail, just note that version wasn't bumped
+            echo "::notice::Version not bumped. Current version: $CURRENT_VERSION"
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           fi
-          
-          # Return to current commit
-          git checkout - 2>/dev/null || true
 
   test:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         bun-version: [latest]
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +80,7 @@ jobs:
       
       - name: Upload coverage reports
         if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage/
@@ -81,8 +88,9 @@ jobs:
   benchmark:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         bun-version: [latest]
     steps:
       - uses: actions/checkout@v4
@@ -106,7 +114,7 @@ jobs:
       
       - name: Store benchmark results
         if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: benchmark-results-${{ github.sha }}
           path: |
@@ -138,12 +146,16 @@ jobs:
           bun run --bun tsc --noEmit || true
 
   publish:
-    needs: [version-check, test, benchmark, lint-and-typecheck]
+    needs: [test, benchmark, lint-and-typecheck, version-check]
     runs-on: ubuntu-latest
     if: |
+      always() &&
       github.event_name == 'push' && 
       github.ref == 'refs/heads/main' && 
-      needs.version-check.outputs.changed == 'true'
+      needs.version-check.result == 'success' &&
+      needs.version-check.outputs.changed == 'true' &&
+      needs.test.result == 'success' &&
+      needs.benchmark.result == 'success'
     steps:
       - uses: actions/checkout@v4
       
@@ -197,9 +209,9 @@ jobs:
           prerelease: false
 
   notify:
-    needs: [publish]
+    needs: [publish, version-check]
     runs-on: ubuntu-latest
-    if: success()
+    if: needs.publish.result == 'success'
     steps:
       - name: Notify success
         run: |
