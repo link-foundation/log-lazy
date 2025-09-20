@@ -93,6 +93,7 @@ jobs:
         with:
           name: coverage-report
           path: coverage/
+          if-no-files-found: ignore
 
   benchmark:
     runs-on: ubuntu-latest
