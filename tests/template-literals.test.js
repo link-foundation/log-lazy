@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* global describe, test, expect, beforeEach, afterEach, jest */
+
 // For Bun: test functions are globals - use them directly
 // For Node/Deno: import from test-setup.js
 

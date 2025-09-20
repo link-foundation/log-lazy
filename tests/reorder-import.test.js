@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* global describe, test, expect, jest */
+
 // For Bun: test functions are globals - use them directly
 // For Node/Deno: import from test-setup.js
 
@@ -17,8 +20,8 @@ if (typeof Bun === 'undefined') {
 }
 
 // In Bun, use jest.fn and jest.spyOn for mocking
-const mock = typeof Bun !== 'undefined' ? jest.fn : globalThis.mock;
-const spyOn = typeof Bun !== 'undefined' ? jest.spyOn : globalThis.spyOn;
+const _mock = typeof Bun !== 'undefined' ? jest.fn : globalThis.mock;
+const _spyOn = typeof Bun !== 'undefined' ? jest.spyOn : globalThis.spyOn;
 
 describe('Reorder Import Test', () => {
   test('should work with reordered imports', () => {

@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* global describe, test, expect, beforeEach, jest */
+
 // For Bun: test functions are globals - use them directly
 // For Node/Deno: import from test-setup.js
 
@@ -20,7 +23,7 @@ if (typeof Bun === 'undefined') {
 
 // In Bun, use jest.fn and jest.spyOn for mocking
 const mock = typeof Bun !== 'undefined' ? jest.fn : globalThis.mock;
-const spyOn = typeof Bun !== 'undefined' ? jest.spyOn : globalThis.spyOn;
+const _spyOn = typeof Bun !== 'undefined' ? jest.spyOn : globalThis.spyOn;
 
 describe('Bunyan Integration', () => {
   let bunyanLogger;

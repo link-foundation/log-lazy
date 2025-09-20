@@ -4,7 +4,7 @@
 
 const isBun = typeof Bun !== 'undefined';
 const isDeno = typeof Deno !== 'undefined';
-const isNode = !isBun && !isDeno;
+const _isNode = !isBun && !isDeno;
 
 let describe, test, expect, beforeEach, afterEach, mock, spyOn;
 
