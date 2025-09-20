@@ -114,10 +114,10 @@ jobs:
               echo -n "Testing $name... "
               if timeout 5 node "$file" 2>&1 | grep -q "0 failed"; then
                 echo "✓"
-                ((passed++))
+                passed=$((passed + 1))
               else
                 echo "✗"
-                ((failed++))
+                failed=$((failed + 1))
               fi
             fi
           done
@@ -139,10 +139,10 @@ jobs:
               echo -n "Testing $name... "
               if deno test --allow-read "$file" 2>&1 | grep -q "0 failed"; then
                 echo "✓"
-                ((passed++))
+                passed=$((passed + 1))
               else
                 echo "✗"
-                ((failed++))
+                failed=$((failed + 1))
               fi
             fi
           done
