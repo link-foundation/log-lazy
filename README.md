@@ -727,15 +727,16 @@ config:
 ---
 xychart-beta
     title "Production Performance: Mixed Workload at Warn Level (lower is better)"
-    x-axis ["Traditional Logging", "Lazy Logging"]
-    y-axis "Time (milliseconds)" 0.01 --> 100
-    bar [19.04, 0.08]
+    x-axis ["No Logging", "Lazy Logging", "Traditional Logging"]
+    y-axis "Time (milliseconds)" 0 --> 20
+    bar [0.017, 0.08, 19.04]
 ```
 
 **Key Results:**
-- **Traditional**: 19.04 ms - Still evaluates all debug/info expressions even when disabled
-- **Lazy**: 0.08 ms (79.93 µs) - Skips evaluation of disabled logs completely
-- **Performance Gain: 238x faster** in production conditions
+- **No Logging**: 0.017 ms (16.68 µs) - Clean code with zero logging
+- **Lazy Logging**: 0.08 ms (79.93 µs) - All debug/info evaluations skipped
+- **Traditional**: 19.04 ms - Still evaluates all expressions even when disabled
+- **Performance Gain: 238x faster** than traditional in production conditions
 
 This mixed workload includes:
 - Disabled debug logs with `JSON.stringify(largeObject)`
