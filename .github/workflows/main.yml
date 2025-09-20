@@ -105,24 +105,32 @@ jobs:
       - name: Run tests (Node)
         if: matrix.runtime == 'node'
         run: |
-          # Run a simple smoke test with Node.js to ensure the library works
+          # Verify core library works with Node.js
           node --input-type=module -e "
-            import makeLog from './src/index.js';
+            import makeLog, { levels } from './src/index.js';
             const log = makeLog({ level: 'info' });
-            log('Test from Node.js');
-            console.log('✓ Node.js compatibility verified');
+            console.log('✓ Library imports successfully');
+            console.log('✓ Found', Object.keys(levels).length, 'log levels');
+            log('Test message from Node.js');
+            log.error('Error test');
+            console.log('✅ Node.js compatibility verified');
           "
+          # Note: Full test suite requires Bun test runner for complete compatibility
       
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
         run: |
-          # Run a simple smoke test with Deno to ensure the library works
+          # Verify core library works with Deno
           deno eval "
-            import makeLog from './src/index.js';
+            import makeLog, { levels } from './src/index.js';
             const log = makeLog({ level: 'info' });
-            log('Test from Deno');
-            console.log('✓ Deno compatibility verified');
+            console.log('✓ Library imports successfully');
+            console.log('✓ Found', Object.keys(levels).length, 'log levels');
+            log('Test message from Deno');
+            log.error('Error test');
+            console.log('✅ Deno compatibility verified');
           "
+          # Note: Full test suite requires Bun test runner for complete compatibility
       
       - name: Run tests with coverage
         if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'

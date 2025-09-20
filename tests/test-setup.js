@@ -41,6 +41,13 @@ if (isBun) {
         throw new Error(`Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`);
       }
     },
+    toContain: (expected) => {
+      if (typeof actual === 'string' && !actual.includes(expected)) {
+        throw new Error(`Expected "${actual}" to contain "${expected}"`);
+      } else if (Array.isArray(actual) && !actual.includes(expected)) {
+        throw new Error(`Expected array to contain ${expected}`);
+      }
+    },
     toBeUndefined: () => {
       if (actual !== undefined) {
         throw new Error(`Expected ${actual} to be undefined`);
@@ -57,9 +64,15 @@ if (isBun) {
       }
     },
     toHaveBeenCalledWith: (...args) => {
-      if (!actual.calls || !actual.calls.some(call => 
-        JSON.stringify(call) === JSON.stringify(args))) {
-        throw new Error(`Expected function to have been called with ${JSON.stringify(args)}`);
+      if (!actual.calls || actual.calls.length === 0) {
+        throw new Error(`Expected function to have been called with ${JSON.stringify(args)}, but it was never called`);
+      }
+      const found = actual.calls.some(call => {
+        if (call.length !== args.length) return false;
+        return call.every((arg, i) => JSON.stringify(arg) === JSON.stringify(args[i]));
+      });
+      if (!found) {
+        throw new Error(`Expected function to have been called with ${JSON.stringify(args)}, but got: ${JSON.stringify(actual.calls)}`);
       }
     },
     not: {
@@ -142,6 +155,13 @@ if (isBun) {
         throw new Error(`Expected ${JSON.stringify(actual)} to equal ${JSON.stringify(expected)}`);
       }
     },
+    toContain: (expected) => {
+      if (typeof actual === 'string' && !actual.includes(expected)) {
+        throw new Error(`Expected "${actual}" to contain "${expected}"`);
+      } else if (Array.isArray(actual) && !actual.includes(expected)) {
+        throw new Error(`Expected array to contain ${expected}`);
+      }
+    },
     toBeUndefined: () => {
       if (actual !== undefined) {
         throw new Error(`Expected ${actual} to be undefined`);
@@ -158,9 +178,15 @@ if (isBun) {
       }
     },
     toHaveBeenCalledWith: (...args) => {
-      if (!actual.calls || !actual.calls.some(call => 
-        JSON.stringify(call) === JSON.stringify(args))) {
-        throw new Error(`Expected function to have been called with ${JSON.stringify(args)}`);
+      if (!actual.calls || actual.calls.length === 0) {
+        throw new Error(`Expected function to have been called with ${JSON.stringify(args)}, but it was never called`);
+      }
+      const found = actual.calls.some(call => {
+        if (call.length !== args.length) return false;
+        return call.every((arg, i) => JSON.stringify(arg) === JSON.stringify(args[i]));
+      });
+      if (!found) {
+        throw new Error(`Expected function to have been called with ${JSON.stringify(args)}, but got: ${JSON.stringify(actual.calls)}`);
       }
     },
     not: {
@@ -241,7 +267,10 @@ if (isBun) {
     }
     
     console.log(`\n${passed} passed, ${failed} failed`);
-    if (failed > 0) process.exit(1);
+    // Store result for checking but don't exit immediately
+    if (typeof process !== 'undefined') {
+      process.exitCode = failed > 0 ? 1 : 0;
+    }
   });
 }
 
