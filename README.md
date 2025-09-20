@@ -17,7 +17,11 @@ A high-performance lazy logging library with bitwise level control, designed to 
 ## 📦 Installation
 
 ```bash
-bun add log-lazy
+bun i log-lazy
+npm i log-lazy
+yarn add log-lazy
+pnpm add log-lazy
+deno add npm:log-lazy
 ```
 
 ## ⚡ Quick Start
