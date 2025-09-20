@@ -1,20 +1,24 @@
 // Runtime-agnostic test setup
+// For Bun: Test files should use the globals directly (describe, test, expect, jest.fn, jest.spyOn)
+// For Node/Deno: Import this module to get test utilities
+
 const isBun = typeof Bun !== 'undefined';
 const isDeno = typeof Deno !== 'undefined';
-const _isNode = !isBun && !isDeno;
+const isNode = !isBun && !isDeno;
 
 let describe, test, expect, beforeEach, afterEach, mock, spyOn;
 
 if (isBun) {
-  // Use Bun's built-in test framework
-  const bunTest = await import('bun:test');
-  describe = bunTest.describe;
-  test = bunTest.test;
-  expect = bunTest.expect;
-  beforeEach = bunTest.beforeEach;
-  afterEach = bunTest.afterEach;
-  mock = bunTest.mock;
-  spyOn = bunTest.spyOn;
+  // In Bun test files, these are available as globals
+  // We can't access them here, so we return dummy functions
+  // Real Bun test files should use the globals directly
+  describe = globalThis.describe || (() => { throw new Error('Use globals directly in Bun test files'); });
+  test = globalThis.test || (() => { throw new Error('Use globals directly in Bun test files'); });
+  expect = globalThis.expect || (() => { throw new Error('Use globals directly in Bun test files'); });
+  beforeEach = globalThis.beforeEach || (() => { throw new Error('Use globals directly in Bun test files'); });
+  afterEach = globalThis.afterEach || (() => { throw new Error('Use globals directly in Bun test files'); });
+  mock = () => { throw new Error('Use jest.fn directly in Bun test files'); };
+  spyOn = () => { throw new Error('Use jest.spyOn directly in Bun test files'); };
 } else if (isDeno) {
   // Use Deno's built-in test framework with compatibility layer
   const { test: denoTest } = Deno;

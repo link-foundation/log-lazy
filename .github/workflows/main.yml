@@ -132,19 +132,20 @@ jobs:
           "
           # Note: Full test suite requires Bun test runner for complete compatibility
       
-      # Coverage is temporarily disabled due to Bun crash on Ubuntu
-      # https://bun.report/1.2.20/Bt16ad208bAgkgQkrozsE+ypR_682u+D07zm+Dyig0nFuzx7rF_6nuu+D6nuu+DA2AqM
-      # - name: Run tests with coverage
-      #   if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
-      #   run: bun test --coverage
+      # Coverage works because we don't import from 'bun:test' anymore
+      # Bun test functions are available as globals in test files
+      # Non-Bun runtimes import from test-setup.js
+      - name: Run tests with coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
+        run: bun test --coverage
       
-      # - name: Upload coverage reports
-      #   if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: coverage-report
-      #     path: coverage/
-      #     if-no-files-found: ignore
+      - name: Upload coverage reports
+        if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          if-no-files-found: ignore
 
   benchmark:
     runs-on: ubuntu-latest
