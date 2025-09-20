@@ -104,6 +104,7 @@ jobs:
       
       - name: Run tests (Node)
         if: matrix.runtime == 'node'
+        shell: bash
         run: |
           echo "Running Node.js test suite..."
           passed=0
@@ -131,6 +132,7 @@ jobs:
       
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
+        shell: bash
         run: |
           echo "Running Deno test suite..."
           passed=0
