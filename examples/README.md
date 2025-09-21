@@ -8,7 +8,7 @@ This directory contains examples demonstrating the key features of log-lazy.
 The main showcase example demonstrating lazy evaluation with template strings. Shows how to use `log()` and `log.error()` with zero performance cost in production.
 
 ### ⚡ [comparison.js](./comparison.js)
-Direct performance comparison between traditional logging and lazy logging, showing the 2500x speed improvement.
+Performance comparison between traditional logging and lazy logging, showing the 2500x speed improvement.
 
 ### 🔧 [complete.js](./complete.js)  
 Comprehensive example showing all log levels and how they behave in production mode.
