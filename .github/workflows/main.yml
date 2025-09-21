@@ -8,8 +8,180 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
+  # === DETECT CHANGES ===
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      docs-only: ${{ steps.changes.outputs.docs-only }}
+      js-changed: ${{ steps.changes.outputs.js }}
+      md-changed: ${{ steps.changes.outputs.md }}
+      package-changed: ${{ steps.changes.outputs.package }}
+      workflow-changed: ${{ steps.changes.outputs.workflow }}
+      any-code-changed: ${{ steps.changes.outputs.code }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changes
+        id: changes
+        run: |
+          # For PRs, compare against base branch; for pushes, compare with previous commit
+          EVENT_NAME="${{ github.event_name }}"
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+            git fetch origin $BASE_SHA
+            CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA 2>/dev/null || echo "")
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git ls-tree --name-only -r HEAD)
+          fi
+
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Check for JavaScript file changes
+          if echo "$CHANGED_FILES" | grep -qE '\.(js|mjs|cjs)$'; then
+            echo "js=true" >> $GITHUB_OUTPUT
+          else
+            echo "js=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Check for Markdown file changes
+          if echo "$CHANGED_FILES" | grep -q '\.md$'; then
+            echo "md=true" >> $GITHUB_OUTPUT
+          else
+            echo "md=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Check for package.json changes
+          if echo "$CHANGED_FILES" | grep -q '^package\.json$'; then
+            echo "package=true" >> $GITHUB_OUTPUT
+          else
+            echo "package=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Check for workflow changes
+          if echo "$CHANGED_FILES" | grep -q '\.github/workflows/'; then
+            echo "workflow=true" >> $GITHUB_OUTPUT
+          else
+            echo "workflow=false" >> $GITHUB_OUTPUT
+          fi
+
+          # Check if ONLY documentation changed (no code changes)
+          if echo "$CHANGED_FILES" | grep -v '\.md$' | grep -q '.'; then
+            echo "docs-only=false" >> $GITHUB_OUTPUT
+          else
+            # All changed files are .md files
+            if [ -n "$CHANGED_FILES" ] && echo "$CHANGED_FILES" | grep -q '\.md$'; then
+              echo "docs-only=true" >> $GITHUB_OUTPUT
+            else
+              echo "docs-only=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+          # Check for any code changes (excluding pure documentation)
+          if echo "$CHANGED_FILES" | grep -qE '\.(js|mjs|cjs|ts|json|yml|yaml)$|\.github/workflows/'; then
+            echo "code=true" >> $GITHUB_OUTPUT
+          else
+            echo "code=false" >> $GITHUB_OUTPUT
+          fi
+
+  # === FILE LINE LIMIT CHECK ===
+  check-file-line-limits:
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.js-changed == 'true' ||
+      needs.detect-changes.outputs.md-changed == 'true' ||
+      needs.detect-changes.outputs.workflow-changed == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check .js file line limits
+        if: needs.detect-changes.outputs.js-changed == 'true'
+        run: |
+          echo "Checking that all .js files are under 1500 lines..."
+
+          # Create a temporary file to track failures
+          FAILURES_FILE=$(mktemp)
+
+          # Check all .js, .mjs, .cjs files in the repository
+          find . -type f \( -name "*.js" -o -name "*.mjs" -o -name "*.cjs" \) | grep -v node_modules | while read -r file; do
+            line_count=$(wc -l < "$file")
+            echo "📄 $file: $line_count lines"
+
+            if [ $line_count -gt 1500 ]; then
+              echo "❌ ERROR: $file has $line_count lines, which exceeds the 1500 line limit!"
+              echo "::error file=$file::File has $line_count lines (limit: 1500)"
+              echo "$file" >> "$FAILURES_FILE"
+            else
+              echo "✅ $file is within the 1500 line limit"
+            fi
+          done
+
+          # Check if any failures occurred
+          if [ -s "$FAILURES_FILE" ]; then
+            echo ""
+            echo "❌ The following .js files exceed the 1500 line limit:"
+            cat "$FAILURES_FILE"
+            echo ""
+            echo "Please reorganize the code to split large files into smaller modules."
+            echo "Each .js file should have no more than 1500 lines of code."
+            rm -f "$FAILURES_FILE"
+            exit 1
+          else
+            echo ""
+            echo "✅ All .js files are within the 1500 line limit!"
+            rm -f "$FAILURES_FILE"
+          fi
+
+      - name: Check .md file line limits
+        if: needs.detect-changes.outputs.md-changed == 'true'
+        run: |
+          echo "Checking that all .md files are under 1500 lines..."
+
+          # Create a temporary file to track failures
+          FAILURES_FILE=$(mktemp)
+
+          # Check all .md files in the repository
+          find . -name "*.md" -type f | while read -r file; do
+            line_count=$(wc -l < "$file")
+            echo "📄 $file: $line_count lines"
+
+            if [ $line_count -gt 1500 ]; then
+              echo "❌ ERROR: $file has $line_count lines, which exceeds the 1500 line limit!"
+              echo "::error file=$file::File has $line_count lines (limit: 1500)"
+              echo "$file" >> "$FAILURES_FILE"
+            else
+              echo "✅ $file is within the 1500 line limit"
+            fi
+          done
+
+          # Check if any failures occurred
+          if [ -s "$FAILURES_FILE" ]; then
+            echo ""
+            echo "❌ The following .md files exceed the 1500 line limit:"
+            cat "$FAILURES_FILE"
+            echo ""
+            echo "Please split large documentation files into smaller, more focused documents."
+            echo "Each .md file should have no more than 1500 lines."
+            rm -f "$FAILURES_FILE"
+            exit 1
+          else
+            echo ""
+            echo "✅ All .md files are within the 1500 line limit!"
+            rm -f "$FAILURES_FILE"
+          fi
+
   version-check:
     runs-on: ubuntu-latest
+    needs: detect-changes
+    # Skip version check if only documentation changed
+    if: needs.detect-changes.outputs.docs-only == 'false'
     outputs:
       should_publish: ${{ steps.check.outputs.should_publish }}
       version: ${{ steps.check.outputs.version }}
@@ -17,23 +189,23 @@ jobs:
       npm_version: ${{ steps.check.outputs.npm_version }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Check if version needs publishing
         id: check
         run: |
           # Get version and package name from package.json
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           PACKAGE_NAME=$(node -p "require('./package.json').name")
-          
+
           echo "Package: $PACKAGE_NAME"
           echo "Current version: $CURRENT_VERSION"
           echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
-          
+
           # Check what version is currently published on npm
           NPM_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "not-found")
           echo "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT
-          
+
           # For PRs, check if version is bumped
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             if [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
@@ -44,7 +216,7 @@ jobs:
             echo "should_publish=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           # For main branch, check if this version exists on npm
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
             if [ "$NPM_VERSION" = "not-found" ]; then
@@ -64,6 +236,9 @@ jobs:
 
   test:
     runs-on: ${{ matrix.os }}
+    needs: [detect-changes, check-file-line-limits]
+    # Skip tests if only documentation changed
+    if: needs.detect-changes.outputs.docs-only == 'false'
     strategy:
       fail-fast: false
       matrix:
@@ -71,37 +246,37 @@ jobs:
         runtime: [bun, node, deno]
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Bun
         if: matrix.runtime == 'bun'
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.2.20"
-      
+
       - name: Setup Node.js
         if: matrix.runtime == 'node'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Setup Deno
         if: matrix.runtime == 'deno'
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      
+
       - name: Install dependencies (Bun)
         if: matrix.runtime == 'bun'
         run: bun install --frozen-lockfile
-      
+
       - name: Install dependencies (Node)
         if: matrix.runtime == 'node'
         run: npm ci
-      
+
       - name: Run tests (Bun)
         if: matrix.runtime == 'bun'
         run: bun test
-      
+
       - name: Run tests (Node)
         if: matrix.runtime == 'node'
         shell: bash
@@ -129,7 +304,7 @@ jobs:
           if [ $failed -ne 0 ]; then
             exit 1
           fi
-      
+
       - name: Run tests (Deno)
         if: matrix.runtime == 'deno'
         shell: bash
@@ -158,7 +333,7 @@ jobs:
           if [ $failed -ne 0 ]; then
             exit 1
           fi
-      
+
       # Coverage works because we don't import from 'bun:test' anymore
       # Bun test functions are available as globals in test files
       # Non-Bun runtimes import from test-setup.js
@@ -170,7 +345,7 @@ jobs:
           echo ""
           echo "Coverage Summary:"
           tail -5 coverage.txt
-      
+
       - name: Upload coverage reports
         if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
         uses: actions/upload-artifact@v4
@@ -181,26 +356,29 @@ jobs:
 
   benchmark:
     runs-on: ubuntu-latest
+    needs: [detect-changes, check-file-line-limits]
+    # Skip benchmarks if only documentation changed
+    if: needs.detect-changes.outputs.docs-only == 'false'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Run benchmarks
         run: |
           echo "Running lazy vs traditional benchmarks..."
           bun run benchmarks/lazy-vs-traditional.bench.js
-          
+
           echo ""
           echo "Running no logs vs lazy logs benchmarks..."
           bun run benchmarks/no-logs-vs-lazy-logs.bench.js
-      
+
       - name: Store benchmark results
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v4
@@ -212,56 +390,99 @@ jobs:
 
   lint-and-typecheck:
     runs-on: ubuntu-latest
+    needs: [detect-changes, check-file-line-limits]
+    # Skip linting if only documentation changed
+    if: needs.detect-changes.outputs.docs-only == 'false'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Run ESLint
         run: |
           echo "Running ESLint..."
           bun run lint
-      
+
       - name: Test TypeScript definitions
         run: |
           echo "Testing TypeScript definitions..."
           bun run test:types
 
+  # === DOCUMENTATION VALIDATION (runs when docs change) ===
+  validate-docs:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, check-file-line-limits]
+    if: needs.detect-changes.outputs.md-changed == 'true'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate markdown files
+        run: |
+          echo "Validating markdown files..."
+
+          # Check for broken internal links
+          echo "Checking for broken internal links..."
+          for file in $(find . -name "*.md" -type f); do
+            echo "Checking $file..."
+            # Extract markdown links [text](link)
+            grep -oE '\[([^\]]+)\]\(([^)]+)\)' "$file" | grep -oE '\]\(([^)]+)\)' | sed 's/](\(.*\))/\1/' | while read -r link; do
+              # Skip external links
+              if [[ "$link" == http* ]] || [[ "$link" == mailto:* ]]; then
+                continue
+              fi
+              # Skip anchors
+              if [[ "$link" == \#* ]]; then
+                continue
+              fi
+              # Check if internal file exists
+              dir=$(dirname "$file")
+              target="$dir/$link"
+              # Remove anchor if present
+              target="${target%%#*}"
+              if [ ! -f "$target" ] && [ ! -d "$target" ]; then
+                echo "  ⚠️  Broken link in $file: $link"
+              fi
+            done
+          done
+
+          echo "✅ Documentation validation completed"
+
   publish:
     needs: [test, benchmark, lint-and-typecheck, version-check]
     runs-on: ubuntu-latest
     if: |
-      github.event_name == 'push' && 
+      github.event_name == 'push' &&
       github.ref == 'refs/heads/main' &&
       needs.version-check.outputs.should_publish == 'true'
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
-      
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
+
       - name: Create Git Tag
         run: |
           VERSION="${{ needs.version-check.outputs.version }}"
@@ -269,20 +490,20 @@ jobs:
           git config --global user.email "actions@github.com"
           git tag -a "${VERSION}" -m "Release ${VERSION}"
           git push origin "${VERSION}"
-      
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION="${{ needs.version-check.outputs.version }}"
           PACKAGE_NAME="${{ needs.version-check.outputs.package_name }}"
-          
+
           # Create release using GitHub CLI with heredoc
           gh release create "${VERSION}" \
             --title "${VERSION}" \
             --notes "$(cat <<EOF
           https://www.npmjs.com/package/${PACKAGE_NAME}/v/${VERSION}
-          
+
           \`\`\`bash
           bun i ${PACKAGE_NAME}@${VERSION}
           npm i ${PACKAGE_NAME}@${VERSION}
@@ -290,13 +511,13 @@ jobs:
           pnpm add ${PACKAGE_NAME}@${VERSION}
           deno add npm:${PACKAGE_NAME}@${VERSION}
           \`\`\`
-          
+
           https://github.com/${{ github.repository }}/blob/${VERSION}/README.md
           EOF
           )"
 
   summary:
-    needs: [test, benchmark, lint-and-typecheck, version-check, publish]
+    needs: [detect-changes, test, benchmark, lint-and-typecheck, version-check, publish, validate-docs, check-file-line-limits]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -309,16 +530,35 @@ jobs:
           echo "- Branch: ${{ github.ref_name }}"
           echo "- Commit: ${{ github.sha }}"
           echo ""
-          
+
+          echo "### Change Detection"
+          echo "- Documentation only: ${{ needs.detect-changes.outputs.docs-only }}"
+          echo "- JavaScript changed: ${{ needs.detect-changes.outputs.js-changed }}"
+          echo "- Markdown changed: ${{ needs.detect-changes.outputs.md-changed }}"
+          echo "- Any code changed: ${{ needs.detect-changes.outputs.any-code-changed }}"
+          echo ""
+
           echo "### Job Results"
-          echo "- Version Check: ${{ needs.version-check.result }}"
-          echo "- Tests (Bun/Node/Deno): ${{ needs.test.result }}"
-          echo "- Benchmarks: ${{ needs.benchmark.result }}"
-          echo "- Lint & Type Check: ${{ needs.lint-and-typecheck.result }}"
-          
+          echo "- File Line Limits: ${{ needs.check-file-line-limits.result }}"
+
+          if [ "${{ needs.detect-changes.outputs.docs-only }}" == "true" ]; then
+            echo "- Documentation Validation: ${{ needs.validate-docs.result }}"
+            echo ""
+            echo "📝 **Note:** Only documentation changed. Skipping code-related jobs (tests, benchmarks, linting)."
+          else
+            echo "- Version Check: ${{ needs.version-check.result }}"
+            echo "- Tests (Bun/Node/Deno): ${{ needs.test.result }}"
+            echo "- Benchmarks: ${{ needs.benchmark.result }}"
+            echo "- Lint & Type Check: ${{ needs.lint-and-typecheck.result }}"
+
+            if [ "${{ needs.detect-changes.outputs.md-changed }}" == "true" ]; then
+              echo "- Documentation Validation: ${{ needs.validate-docs.result }}"
+            fi
+          fi
+
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "- Publish: ${{ needs.publish.result }}"
-            
+
             if [ "${{ needs.version-check.outputs.should_publish }}" == "true" ]; then
               echo ""
               echo "### 📦 Publishing"
@@ -328,17 +568,17 @@ jobs:
                 echo "- Status: ✅ Published successfully!"
                 echo "- View on NPM: https://www.npmjs.com/package/${{ needs.version-check.outputs.package_name }}/v/${{ needs.version-check.outputs.version }}"
               elif [ "${{ needs.publish.result }}" == "skipped" ]; then
-                echo "- Status: ⏭️ Skipped (version already published)"
+                echo "- Status: ⏭️ Skipped (version already published or docs-only change)"
               else
                 echo "- Status: ❌ Failed"
               fi
             else
               echo ""
               echo "### 📦 Publishing"
-              echo "- Status: ⏭️ Skipped (no version change)"
+              echo "- Status: ⏭️ Skipped (no version change or docs-only change)"
             fi
           fi
-          
+
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo ""
             echo "### Pull Request Check"
