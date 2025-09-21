@@ -31,9 +31,9 @@ deno add npm:log-lazy
 ```javascript
 import makeLog from 'log-lazy';
 
-const log = makeLog({ level: 'info' }); // ✨ Direct, simple, efficient!
+const log = makeLog({ level: 'info' }); // ✨ Simple, efficient!
 
-// Preferred: Use log() directly (defaults to info level)
+// Preferred: Use log() (defaults to info level)
 log('Server started');
 log(() => `User ${user.id} logged in`); // With lazy evaluation
 
@@ -46,7 +46,7 @@ log.debug(() => `Debug data: ${JSON.stringify(largeObject)}`); // Not evaluated!
 log(() => `Processing ${items.length} items`); // Evaluated and logged at info level
 ```
 
-**That's it!** Simple, direct, and efficient!
+**That's it!** Simple and efficient!
 
 ## 🎯 The Problem This Solves
 
@@ -73,7 +73,7 @@ log.info(`Processing order #${order.id} with ${order.items.length} items totalin
 ### ✅ Lazy Logging (Only Evaluates When Needed)
 ```javascript
 import makeLog from 'log-lazy';
-const log = makeLog({ level: 'info' }); // Direct and simple!
+const log = makeLog({ level: 'info' }); // Simple!
 
 // Preferred: Use log() for info-level logging
 log(() => `Processing order #${order.id} with ${order.items.length} items totaling $${order.calculateTotal()}`);
@@ -153,10 +153,10 @@ const devLog = makeLog({ level: 'development' });  // fatal, error, warn, info, 
 ```javascript
 import makeLog from 'log-lazy';
 
-// Create log directly - clean and simple!
+// Create log - clean and simple!
 const log = makeLog({ level: 'info' }); // ✨ That's it!
 
-// Preferred: Use log() directly (defaults to info level)
+// Preferred: Use log() (defaults to info level)
 log(() => `Server started on port ${port}`);
 log(() => `Processing request: ${JSON.stringify(request)}`);
 
@@ -164,7 +164,7 @@ log(() => `Processing request: ${JSON.stringify(request)}`);
 log.error(() => `Failed to connect: ${error.message}`);
 log.debug(() => `State: ${JSON.stringify(state)}`); // Zero cost when disabled!
 
-// Clean, direct API with zero overhead! 🎯
+// Clean API with zero overhead! 🎯
 ```
 
 ### Lazy Evaluation Examples
@@ -327,7 +327,7 @@ class OrderService {
   constructor() {
     this.log = makeLog({ 
       level: process.env.LOG_LEVEL || 'info' 
-    }); // Direct and clean!
+    }); // Clean and simple!
   }
 
   async createOrder(orderData) {
