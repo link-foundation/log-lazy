@@ -1,4 +1,4 @@
-# log-lazy
+# [log-lazy](https://github.com/link-foundation/log-lazy)
 
 [![CI/CD](https://github.com/link-foundation/log-lazy/actions/workflows/main.yml/badge.svg)](https://github.com/link-foundation/log-lazy/actions/workflows/main.yml)
 [![npm version](https://img.shields.io/npm/v/log-lazy)](https://www.npmjs.com/package/log-lazy)
@@ -741,6 +741,8 @@ xychart-beta
     y-axis "Time (milliseconds)" 0 --> 20
     bar [0.017, 0.08, 19.04]
 ```
+
+If you see mermaid markup here, you better go to [this README page on GitHub to see actual rendering](https://github.com/link-foundation/log-lazy?tab=readme-ov-file#-benchmarks).
 
 **Key Results:**
 - **No Logging**: 0.017 ms (16.68 µs) - Clean code with zero logging
