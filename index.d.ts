@@ -39,6 +39,10 @@ export interface LogOptions {
   presets?: {
     [key: string]: Partial<LogOptions>;
   };
+  /** Preprocessors to transform arguments before processing (receive args array, return args array) */
+  preprocessors?: Array<(args: any[], level: number) => any[]>;
+  /** Postprocessors to transform compiled message before output (receive string, return string) */
+  postprocessors?: Array<(message: string, level: number, levelName: string) => string>;
 }
 
 export interface LogFunction {
@@ -106,3 +110,27 @@ export declare const defaultLog: LogFunction;
 
 /** Alias for defaultLog */
 export declare const log: LogFunction;
+
+/** Built-in postprocessor helpers */
+export declare const postprocessors: {
+  /** Add timestamp prefix with configurable format (iso, locale, time, ms) */
+  timestamp: (format?: 'iso' | 'locale' | 'time' | 'ms') => (message: string) => string;
+  /** Add log level prefix */
+  level: () => (message: string, level: number, levelName: string) => string;
+  /** Add process ID prefix */
+  pid: () => (message: string) => string;
+  /** Add custom text prefix */
+  prefix: (text: string) => (message: string) => string;
+  /** Add custom text suffix */
+  suffix: (text: string) => (message: string) => string;
+};
+
+/** Built-in preprocessor helpers */
+export declare const preprocessors: {
+  /** Add context object to all log calls */
+  addContext: (context: any) => (args: any[]) => any[];
+  /** Filter arguments based on predicate */
+  filter: (predicate: (arg: any) => boolean) => (args: any[]) => any[];
+  /** Transform all arguments */
+  map: (transform: (arg: any) => any) => (args: any[]) => any[];
+};
