@@ -52,18 +52,18 @@ export const getLevelOrDefault = (level, levelsMap, defaultValue = 0) => {
 export const makeLog = (options = {}) => {
   // Create local levels object with static values
   const logLevels = { ...levels };
-  
+
   // Create local reverse map
   const logLevelNames = { ...levelNames };
-  
+
   // Common combinations (can be overridden via options.presets)
   logLevels.production = options.presets?.production || (logLevels.fatal | logLevels.error | logLevels.warn);  // 7
   logLevels.development = options.presets?.development || (logLevels.fatal | logLevels.error | logLevels.warn | logLevels.info | logLevels.debug);  // 31
-  
+
   // Add presets to reverse map
   logLevelNames[logLevels.production] = 'production';
   logLevelNames[logLevels.development] = 'development';
-  
+
   // Allow custom presets via options
   if (options.presets) {
     Object.keys(options.presets).forEach(presetName => {
@@ -73,10 +73,10 @@ export const makeLog = (options = {}) => {
       }
     });
   }
-  
+
   // Parse log level from options.level
   let currentLevel = getLevelOrDefault(options.level, logLevels, logLevels.info);
-  
+
   // Allow overriding console functions
   const externalLog = {
     fatal: options.log?.fatal || console.error,
@@ -88,6 +88,16 @@ export const makeLog = (options = {}) => {
     trace: options.log?.trace || console.log,
     silly: options.log?.silly || console.log
   };
+
+  // Preprocessors and postprocessors
+  // Preprocessors: receive args array, return args array
+  // Postprocessors: receive compiled string, return string
+  const preprocessors = options.preprocessors || [];
+  const postprocessors = options.postprocessors || [];
+
+  // Check if we have any processors (for zero-overhead optimization)
+  const hasPreprocessors = preprocessors.length > 0;
+  const hasPostprocessors = postprocessors.length > 0;
   
   // shouldLog function
   const shouldLog = (level) => {
@@ -96,14 +106,22 @@ export const makeLog = (options = {}) => {
     return (currentLevel & levelFlag) !== 0;
   };
   
-  // Core log function
+  // Core log function with preprocessor and postprocessor support
   const logMessage = (level, ...args) => {
     if (!shouldLog(level)) {
       return;
     }
-    
+
+    // Apply preprocessors if configured (zero overhead when not used)
+    let processableArgs = args;
+    if (hasPreprocessors) {
+      for (const preprocessor of preprocessors) {
+        processableArgs = preprocessor(processableArgs, level);
+      }
+    }
+
     // Process arguments: if any arg is a function, call it to get the value
-    const processedArgs = args.map(arg => {
+    const processedArgs = processableArgs.map(arg => {
       if (typeof arg === 'function') {
         try {
           return arg();
@@ -113,14 +131,41 @@ export const makeLog = (options = {}) => {
       }
       return arg;
     });
-    
+
     // Find the output function for this level
     const levelName = typeof level === 'number' ? logLevelNames[level] : level;
-    
-    // Get the output function for this level name
-    const outputFn = externalLog[levelName];
-    if (outputFn) {
-      outputFn(...processedArgs);
+
+    // Apply postprocessors if configured (zero overhead when not used)
+    if (hasPostprocessors) {
+      // Convert args to string (compile)
+      const compiledMessage = processedArgs.map(arg => {
+        if (typeof arg === 'object') {
+          try {
+            return JSON.stringify(arg);
+          } catch {
+            return String(arg);
+          }
+        }
+        return String(arg);
+      }).join(' ');
+
+      // Apply postprocessors
+      let finalMessage = compiledMessage;
+      for (const postprocessor of postprocessors) {
+        finalMessage = postprocessor(finalMessage, level, levelName);
+      }
+
+      // Output the final message
+      const outputFn = externalLog[levelName];
+      if (outputFn) {
+        outputFn(finalMessage);
+      }
+    } else {
+      // No postprocessors - use original fast path
+      const outputFn = externalLog[levelName];
+      if (outputFn) {
+        outputFn(...processedArgs);
+      }
     }
   };
   
@@ -173,6 +218,66 @@ export const makeLog = (options = {}) => {
   log.levelNames = logLevelNames;
   
   return log;
+};
+
+// Built-in postprocessor helpers for common use cases
+export const postprocessors = {
+  // Add timestamp prefix
+  timestamp: (format = 'iso') => (message) => {
+    const now = new Date();
+    let prefix;
+    if (format === 'iso') {
+      prefix = now.toISOString();
+    } else if (format === 'locale') {
+      prefix = now.toLocaleString();
+    } else if (format === 'time') {
+      prefix = now.toLocaleTimeString();
+    } else if (format === 'ms') {
+      prefix = now.getTime().toString();
+    } else {
+      prefix = now.toISOString();
+    }
+    return `[${prefix}] ${message}`;
+  },
+
+  // Add log level prefix
+  level: () => (message, level, levelName) => {
+    return `[${levelName.toUpperCase()}] ${message}`;
+  },
+
+  // Add process ID prefix (for Node.js/Bun)
+  pid: () => (message) => {
+    const pid = typeof process !== 'undefined' && process.pid ? process.pid : 'unknown';
+    return `[PID:${pid}] ${message}`;
+  },
+
+  // Add custom prefix
+  prefix: (text) => (message) => {
+    return `${text} ${message}`;
+  },
+
+  // Add custom suffix
+  suffix: (text) => (message) => {
+    return `${message} ${text}`;
+  }
+};
+
+// Built-in preprocessor helpers
+export const preprocessors = {
+  // Add context object to all log calls
+  addContext: (context) => (args) => {
+    return [...args, context];
+  },
+
+  // Filter out certain arguments
+  filter: (predicate) => (args) => {
+    return args.filter(predicate);
+  },
+
+  // Transform all arguments
+  map: (transform) => (args) => {
+    return args.map(transform);
+  }
 };
 
 // Default exports for convenience
