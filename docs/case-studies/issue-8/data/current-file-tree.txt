@@ -1,5 +1,5 @@
-.github/workflows/main.yml
-.github/workflows/release.yml
+.github/workflows/js.yml
+.github/workflows/rust.yml
 .gitignore
 CONTRIBUTING.md
 Cargo.lock

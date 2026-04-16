@@ -1,6 +1,6 @@
 # [log-lazy](https://github.com/link-foundation/log-lazy)
 
-[![CI/CD](https://github.com/link-foundation/log-lazy/actions/workflows/main.yml/badge.svg)](https://github.com/link-foundation/log-lazy/actions/workflows/main.yml)
+[![JavaScript](https://github.com/link-foundation/log-lazy/actions/workflows/js.yml/badge.svg)](https://github.com/link-foundation/log-lazy/actions/workflows/js.yml)
 [![npm version](https://img.shields.io/npm/v/log-lazy)](https://www.npmjs.com/package/log-lazy)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 
