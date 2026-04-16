@@ -1,0 +1,37 @@
+tracing-subscriber #logging #tracing #metrics #subscriber
+Utilities for implementing and composing `tracing` subscribers.
+version: 0.3.23
+license: MIT
+rust-version: 1.65.0
+documentation: https://docs.rs/tracing-subscriber/0.3.23
+homepage: https://tokio.rs
+repository: https://github.com/tokio-rs/tracing
+crates.io: https://crates.io/crates/tracing-subscriber/0.3.23
+features:
+ +default        = [smallvec, fmt, ansi, tracing-log, std]
+  alloc          = []
+  ansi           = [fmt, nu-ansi-term]
+  fmt            = [registry, std]
+  nu-ansi-term   = [dep:nu-ansi-term]
+  registry       = [sharded-slab, thread_local, std]
+  sharded-slab   = [dep:sharded-slab]
+  smallvec       = [dep:smallvec]
+  std            = [alloc, tracing-core/std]
+  thread_local   = [dep:thread_local]
+  tracing-log    = [dep:tracing-log]
+  chrono         = [dep:chrono]
+  env-filter     = [matchers, once_cell, tracing, std, thread_local, dep:regex-automata]
+  json           = [tracing-serde, serde, serde_json]
+  local-time     = [time/local-offset]
+  matchers       = [dep:matchers]
+  once_cell      = [dep:once_cell]
+  parking_lot    = [dep:parking_lot]
+  regex          = []
+  serde          = [dep:serde]
+  serde_json     = [dep:serde_json]
+  time           = [dep:time]
+  tracing        = [dep:tracing]
+  tracing-serde  = [dep:tracing-serde]
+  valuable       = [tracing-core/valuable, valuable_crate, valuable-serde, tracing-serde/valuable]
+  valuable-serde = [dep:valuable-serde]
+  valuable_crate = [dep:valuable_crate]

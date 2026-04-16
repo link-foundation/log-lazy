@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-16
+### Added
+- Multi-language repository layout with JavaScript package files under `js/`.
+- Rust crate implementation under `rust/` with lazy closures, bitwise levels,
+  custom sinks, custom presets, and lazy formatting macros.
+- CI/CD checks for both JavaScript and Rust packages.
+
 ## [1.0.0] - TBD
 ### Added
 - Full cross-runtime support (Bun, Node.js v20+, Deno)

@@ -1,0 +1,431 @@
+name: JavaScript
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/main' }}
+
+env:
+  JS_ROOT: js
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      mjs-changed: ${{ steps.changes.outputs.mjs-changed }}
+      js-changed: ${{ steps.changes.outputs.js-changed }}
+      package-changed: ${{ steps.changes.outputs.package-changed }}
+      docs-changed: ${{ steps.changes.outputs.docs-changed }}
+      workflow-changed: ${{ steps.changes.outputs.workflow-changed }}
+      any-code-changed: ${{ steps.changes.outputs.any-code-changed }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Detect JavaScript changes
+        id: changes
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          GITHUB_HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
+        run: node scripts/detect-js-changes.mjs
+
+  test-compilation:
+    name: Test Compilation
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      needs.detect-changes.outputs.mjs-changed == 'true' ||
+      needs.detect-changes.outputs.js-changed == 'true' ||
+      needs.detect-changes.outputs.workflow-changed == 'true'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check JavaScript syntax
+        run: bash scripts/check-mjs-syntax.sh
+
+  check-file-line-limits:
+    name: Check File Line Limits
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      needs.detect-changes.outputs.mjs-changed == 'true' ||
+      needs.detect-changes.outputs.js-changed == 'true' ||
+      needs.detect-changes.outputs.docs-changed == 'true' ||
+      needs.detect-changes.outputs.workflow-changed == 'true'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Simulate fresh merge with base branch
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: bash scripts/simulate-fresh-merge.sh
+
+      - name: Enforce file line limits
+        run: bash scripts/check-file-line-limits.sh
+
+  version-check:
+    name: Check npm Version
+    runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      needs.detect-changes.outputs.mjs-changed == 'true' ||
+      needs.detect-changes.outputs.js-changed == 'true' ||
+      needs.detect-changes.outputs.package-changed == 'true' ||
+      needs.detect-changes.outputs.workflow-changed == 'true'
+    outputs:
+      should-publish: ${{ steps.check.outputs.should-publish }}
+      version: ${{ steps.check.outputs.version }}
+      package-name: ${{ steps.check.outputs.package-name }}
+      npm-version: ${{ steps.check.outputs.npm-version }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+
+      - name: Check package version
+        id: check
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+        run: node scripts/check-npm-version.mjs
+
+  lint:
+    name: Lint and Typecheck
+    runs-on: ubuntu-latest
+    needs: [detect-changes, check-file-line-limits]
+    if: |
+      !cancelled() &&
+      (github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.detect-changes.outputs.mjs-changed == 'true' ||
+        needs.detect-changes.outputs.js-changed == 'true' ||
+        needs.detect-changes.outputs.docs-changed == 'true' ||
+        needs.detect-changes.outputs.package-changed == 'true' ||
+        needs.detect-changes.outputs.workflow-changed == 'true') &&
+      (needs.check-file-line-limits.result == 'success' || needs.check-file-line-limits.result == 'skipped')
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Simulate fresh merge with base branch
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: bash scripts/simulate-fresh-merge.sh
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: js
+        run: bun install --frozen-lockfile
+
+      - name: Run ESLint
+        working-directory: js
+        run: bun run lint
+
+      - name: Test TypeScript definitions
+        working-directory: js
+        run: bun run test:types
+
+  test:
+    name: Test (${{ matrix.runtime }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: [detect-changes, test-compilation, lint, check-file-line-limits]
+    if: |
+      !cancelled() &&
+      (github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.detect-changes.outputs.js-changed == 'true' ||
+        needs.detect-changes.outputs.package-changed == 'true' ||
+        needs.detect-changes.outputs.workflow-changed == 'true') &&
+      (needs.test-compilation.result == 'success' || needs.test-compilation.result == 'skipped') &&
+      (needs.lint.result == 'success' || needs.lint.result == 'skipped') &&
+      (needs.check-file-line-limits.result == 'success' || needs.check-file-line-limits.result == 'skipped')
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        runtime: [bun, node, deno]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Simulate fresh merge with base branch
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        shell: bash
+        run: bash scripts/simulate-fresh-merge.sh
+
+      - name: Setup Bun
+        if: matrix.runtime == 'bun'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Setup Node.js
+        if: matrix.runtime == 'node'
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+
+      - name: Setup Deno
+        if: matrix.runtime == 'deno'
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install dependencies with Bun
+        if: matrix.runtime == 'bun'
+        working-directory: js
+        run: bun install --frozen-lockfile
+
+      - name: Install dependencies with npm
+        if: matrix.runtime == 'node'
+        working-directory: js
+        run: npm ci
+
+      - name: Run Bun tests
+        if: matrix.runtime == 'bun'
+        working-directory: js
+        run: bun test
+
+      - name: Run Node.js tests
+        if: matrix.runtime == 'node'
+        working-directory: js
+        shell: bash
+        run: |
+          passed=0
+          failed=0
+          for file in tests/{bunyan,debug,log4js,pino,winston,simple-ci,fix-attempt,reorder-import}.test.js; do
+            output=$(node "$file" 2>&1 || true)
+            if echo "$output" | grep -q "0 failed" && echo "$output" | grep -q "passed"; then
+              echo "$(basename "$file"): passed"
+              passed=$((passed + 1))
+            else
+              echo "$(basename "$file"): failed"
+              echo "$output" | tail -20
+              failed=$((failed + 1))
+            fi
+          done
+          echo "Node.js tests: $passed passed, $failed failed"
+          test "$failed" -eq 0
+
+      - name: Run Deno tests
+        if: matrix.runtime == 'deno'
+        working-directory: js
+        shell: bash
+        run: |
+          passed=0
+          failed=0
+          for file in tests/{debug,log4js,simple-ci,fix-attempt,reorder-import}.test.js; do
+            output=$(deno test --allow-read "$file" 2>&1 || true)
+            if echo "$output" | grep -q "0 failed" && echo "$output" | grep -q "passed"; then
+              echo "$(basename "$file"): passed"
+              passed=$((passed + 1))
+            else
+              echo "$(basename "$file"): failed"
+              echo "$output" | tail -20
+              failed=$((failed + 1))
+            fi
+          done
+          echo "Deno tests: $passed passed, $failed failed"
+          test "$failed" -eq 0
+
+      - name: Run coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'
+        working-directory: js
+        run: bun test --coverage
+
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    needs: [detect-changes, check-file-line-limits]
+    if: |
+      !cancelled() &&
+      (github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.detect-changes.outputs.docs-changed == 'true' ||
+        needs.detect-changes.outputs.workflow-changed == 'true') &&
+      (needs.check-file-line-limits.result == 'success' || needs.check-file-line-limits.result == 'skipped')
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check required documentation files
+        run: |
+          missing=0
+          for file in README.md CONTRIBUTING.md LICENSE js/README.md rust/README.md; do
+            if [ -f "$file" ]; then
+              echo "Found $file"
+            else
+              echo "::error file=$file::Required documentation file is missing"
+              missing=$((missing + 1))
+            fi
+          done
+          test "$missing" -eq 0
+
+  benchmark:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: |
+      !cancelled() &&
+      needs.test.result == 'success' &&
+      (github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.detect-changes.outputs.js-changed == 'true' ||
+        needs.detect-changes.outputs.package-changed == 'true')
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        working-directory: js
+        run: bun install --frozen-lockfile
+
+      - name: Run benchmarks
+        working-directory: js
+        run: bun run bench
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: [detect-changes, lint, test]
+    if: |
+      !cancelled() &&
+      (github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.detect-changes.outputs.js-changed == 'true' ||
+        needs.detect-changes.outputs.package-changed == 'true' ||
+        needs.detect-changes.outputs.workflow-changed == 'true') &&
+      needs.lint.result == 'success' &&
+      needs.test.result == 'success'
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+
+      - name: Install dependencies
+        working-directory: js
+        run: npm ci
+
+      - name: Check package contents
+        working-directory: js
+        run: npm pack --dry-run
+
+  publish:
+    name: Publish npm Package
+    runs-on: ubuntu-latest
+    needs: [version-check, lint, test, benchmark, build]
+    if: |
+      !cancelled() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.version-check.outputs.should-publish == 'true' &&
+      needs.lint.result == 'success' &&
+      needs.test.result == 'success' &&
+      (needs.benchmark.result == 'success' || needs.benchmark.result == 'skipped') &&
+      needs.build.result == 'success'
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        working-directory: js
+        run: npm ci
+
+      - name: Publish to npm
+        id: publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: node scripts/publish-to-npm.mjs
+
+      - name: Create GitHub release
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node scripts/create-js-github-release.mjs \
+            --release-version "${{ steps.publish.outputs.published_version }}" \
+            --package-name "${{ needs.version-check.outputs.package-name }}" \
+            --repository "${{ github.repository }}"
+
+  summary:
+    name: Summary
+    runs-on: ubuntu-latest
+    needs:
+      [
+        detect-changes,
+        test-compilation,
+        check-file-line-limits,
+        version-check,
+        lint,
+        test,
+        validate-docs,
+        benchmark,
+        build,
+        publish,
+      ]
+    if: always()
+    steps:
+      - name: Workflow summary
+        run: |
+          echo "## JavaScript Workflow Summary"
+          echo "- Event: ${{ github.event_name }}"
+          echo "- Ref: ${{ github.ref_name }}"
+          echo "- MJS changed: ${{ needs.detect-changes.outputs.mjs-changed }}"
+          echo "- JS changed: ${{ needs.detect-changes.outputs.js-changed }}"
+          echo "- Package changed: ${{ needs.detect-changes.outputs.package-changed }}"
+          echo "- Docs changed: ${{ needs.detect-changes.outputs.docs-changed }}"
+          echo "- Workflow changed: ${{ needs.detect-changes.outputs.workflow-changed }}"
+          echo "- Compilation: ${{ needs.test-compilation.result }}"
+          echo "- File limits: ${{ needs.check-file-line-limits.result }}"
+          echo "- Version check: ${{ needs.version-check.result }}"
+          echo "- Lint: ${{ needs.lint.result }}"
+          echo "- Test: ${{ needs.test.result }}"
+          echo "- Docs: ${{ needs.validate-docs.result }}"
+          echo "- Benchmarks: ${{ needs.benchmark.result }}"
+          echo "- Build: ${{ needs.build.result }}"
+          echo "- Publish: ${{ needs.publish.result }}"

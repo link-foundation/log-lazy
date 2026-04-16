@@ -1,4 +1,4 @@
-import makeLog from './src/index.js';
+import makeLog from '../src/index.js';
 
 // Create logger with production level (only fatal, error, warn)
 const log = makeLog({ level: 'production' });

@@ -1,4 +1,4 @@
-import makeLog from './src/index.js';
+import makeLog from '../src/index.js';
 
 // Production: minimal logging, maximum performance
 const log = makeLog({ 
