@@ -1,94 +1,53 @@
 # Contributing to log-lazy
 
-Thank you for your interest in contributing to log-lazy! We welcome contributions from the community.
+Thank you for your interest in contributing to `log-lazy`.
 
-## Getting Started
+## Repository Layout
 
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/log-lazy.git`
-3. Create a new branch: `git checkout -b feature/your-feature-name`
-4. Install dependencies: `bun install`
+- `js/`: JavaScript package published to npm as `log-lazy`.
+- `rust/`: Rust crate with the same lazy logging level model.
+- `docs/`: case studies, research notes, and implementation records.
 
-## Development Setup
+## Prerequisites
 
-### Prerequisites
-- Bun >= 1.0.0 (primary runtime)
-- Node.js >= 20.0.0 (for compatibility testing)
-- Deno >= 2.0.0 (optional, for compatibility testing)
+- Bun >= 1.0.0
+- Node.js >= 20.0.0
+- Deno >= 2.0.0 for compatibility checks
+- Rust stable with Cargo
 
-### Running Tests
+## JavaScript Development
 
 ```bash
-# Run all tests with Bun
+cd js
+bun install
 bun test
-
-# Run tests with coverage
-bun test --coverage
-
-# Run tests in all runtimes
+bun run lint
+bun run test:types
 ./test-all.sh
-
-# Run specific test file
-bun test tests/index.test.js
 ```
 
-### Code Quality
+## Rust Development
 
 ```bash
-# Run linter
-bun run lint
-
-# Fix linting issues
-bun run lint:fix
-
-# Run benchmarks
-bun run bench
+cd rust
+cargo test
+cargo test --doc
+cargo fmt --all -- --check
+cargo clippy --all-targets --all-features -- -D warnings
 ```
 
 ## Guidelines
 
-### Code Style
-- Follow the existing code style
-- No unnecessary comments
-- Keep functions focused and small
-- Maintain 100% test coverage
+- Follow the existing code style in the language-specific package you touch.
+- Keep functions focused and small.
+- Add tests for new behavior.
+- Update documentation when user-facing behavior changes.
+- Keep performance-sensitive logging paths lazy; expensive data preparation must
+  stay inside a closure or lazy formatting macro.
 
-### Commit Messages
-- Use clear, descriptive commit messages
-- Follow conventional commits format when possible:
-  - `feat:` for new features
-  - `fix:` for bug fixes
-  - `docs:` for documentation changes
-  - `test:` for test additions/changes
-  - `perf:` for performance improvements
+## Pull Requests
 
-### Pull Requests
-1. Ensure all tests pass on all platforms
-2. Update documentation if needed
-3. Add tests for new features
-4. Keep changes focused - one feature/fix per PR
-5. Update CHANGELOG.md with your changes
-
-### Testing Requirements
-- All tests must pass in Bun, Node.js, and Deno
-- Maintain 100% code coverage
-- Test on multiple platforms if possible (Linux, macOS, Windows)
-
-## Reporting Issues
-
-- Use GitHub Issues to report bugs
-- Include minimal reproduction steps
-- Specify runtime and platform
-- Include relevant error messages
-
-## Performance Considerations
-
-This is a performance-focused library. Please ensure:
-- No performance regressions
-- Run benchmarks before and after changes
-- Lazy evaluation is maintained
-- Zero-cost abstractions when possible
-
-## Questions?
-
-Feel free to open an issue for any questions about contributing.
+1. Run the relevant JavaScript and Rust checks locally.
+2. Update changelog or release metadata when the CI/CD workflow requires it.
+3. Keep changes focused on the issue being solved.
+4. Include reproduction notes and verification commands in the PR description.

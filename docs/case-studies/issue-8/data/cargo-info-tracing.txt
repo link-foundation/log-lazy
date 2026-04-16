@@ -1,0 +1,30 @@
+tracing #logging #tracing #metrics #async
+Application-level tracing for Rust.
+version: 0.1.44
+license: MIT
+rust-version: 1.65.0
+documentation: https://docs.rs/tracing/0.1.44
+homepage: https://tokio.rs
+repository: https://github.com/tokio-rs/tracing
+crates.io: https://crates.io/crates/tracing/0.1.44
+features:
+ +default                 = [std, attributes]
+  attributes              = [tracing-attributes]
+  std                     = [tracing-core/std]
+  tracing-attributes      = [dep:tracing-attributes]
+  async-await             = []
+  log                     = [dep:log]
+  log-always              = [log]
+  max_level_debug         = []
+  max_level_error         = []
+  max_level_info          = []
+  max_level_off           = []
+  max_level_trace         = []
+  max_level_warn          = []
+  release_max_level_debug = []
+  release_max_level_error = []
+  release_max_level_info  = []
+  release_max_level_off   = []
+  release_max_level_trace = []
+  release_max_level_warn  = []
+  valuable                = [tracing-core/valuable]

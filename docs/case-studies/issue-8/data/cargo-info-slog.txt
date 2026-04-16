@@ -1,0 +1,29 @@
+slog #log #logging #structured #hierarchical
+Structured, extensible, composable logging for Rust
+version: 2.8.2
+license: MPL-2.0 OR MIT OR Apache-2.0
+rust-version: 1.61
+documentation: https://docs.rs/slog
+homepage: https://github.com/slog-rs/slog
+repository: https://github.com/slog-rs/slog
+crates.io: https://crates.io/crates/slog/2.8.2
+features:
+ +default                 = [std, nested-values]
+  nested-values           = [dep:erased-serde, dep:serde_core]
+  std                     = [serde_core?/std, anyhow?/std]
+  anyhow                  = [dep:anyhow]
+  dynamic-keys            = []
+  max_level_debug         = []
+  max_level_error         = []
+  max_level_info          = []
+  max_level_off           = []
+  max_level_trace         = []
+  max_level_warn          = []
+  nothreads               = []
+  parking_lot_0_12        = [dep:parking_lot_0_12]
+  release_max_level_debug = []
+  release_max_level_error = []
+  release_max_level_info  = []
+  release_max_level_off   = []
+  release_max_level_trace = []
+  release_max_level_warn  = []

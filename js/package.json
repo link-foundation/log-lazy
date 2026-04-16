@@ -1,6 +1,6 @@
 {
   "name": "log-lazy",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "A lazy logging library with bitwise level control",
   "main": "src/index.js",
   "types": "index.d.ts",
@@ -14,9 +14,7 @@
     "lint:fix": "eslint src tests --fix",
     "bench": "bun run benchmarks/lazy-vs-traditional.bench.js && bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
     "bench:lazy": "bun run benchmarks/lazy-vs-traditional.bench.js",
-    "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
-    "version": "git add -A src",
-    "postversion": "git push && git push --tags"
+    "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js"
   },
   "keywords": [
     "logging",
@@ -42,12 +40,13 @@
   "license": "Unlicense",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/link-foundation/log-lazy.git"
+    "url": "git+https://github.com/link-foundation/log-lazy.git",
+    "directory": "js"
   },
   "bugs": {
     "url": "https://github.com/link-foundation/log-lazy/issues"
   },
-  "homepage": "https://github.com/link-foundation/log-lazy#readme",
+  "homepage": "https://github.com/link-foundation/log-lazy/tree/main/js#readme",
   "files": [
     "src/",
     "index.d.ts",

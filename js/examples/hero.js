@@ -1,5 +1,5 @@
 import winston from 'winston';
-import makeLog from 'log-lazy';
+import makeLog from '../src/index.js';
 
 const user = { id: 42, name: 'Alice', role: 'admin' };
 

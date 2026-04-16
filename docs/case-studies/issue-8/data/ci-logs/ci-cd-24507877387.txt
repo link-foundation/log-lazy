@@ -1,0 +1,550 @@
+detect-changes	Set up job	﻿2026-04-16T11:32:43.5765059Z Current runner version: '2.333.1'
+detect-changes	Set up job	2026-04-16T11:32:43.5794091Z ##[group]Runner Image Provisioner
+detect-changes	Set up job	2026-04-16T11:32:43.5794958Z Hosted Compute Agent
+detect-changes	Set up job	2026-04-16T11:32:43.5795583Z Version: 20260213.493
+detect-changes	Set up job	2026-04-16T11:32:43.5796256Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+detect-changes	Set up job	2026-04-16T11:32:43.5796933Z Build Date: 2026-02-13T00:28:41Z
+detect-changes	Set up job	2026-04-16T11:32:43.5797633Z Worker ID: {351bbe57-5f06-4598-a2ec-aee17b1a4480}
+detect-changes	Set up job	2026-04-16T11:32:43.5798367Z Azure Region: eastus
+detect-changes	Set up job	2026-04-16T11:32:43.5798923Z ##[endgroup]
+detect-changes	Set up job	2026-04-16T11:32:43.5800727Z ##[group]Operating System
+detect-changes	Set up job	2026-04-16T11:32:43.5801547Z Ubuntu
+detect-changes	Set up job	2026-04-16T11:32:43.5802007Z 24.04.4
+detect-changes	Set up job	2026-04-16T11:32:43.5802496Z LTS
+detect-changes	Set up job	2026-04-16T11:32:43.5802985Z ##[endgroup]
+detect-changes	Set up job	2026-04-16T11:32:43.5803470Z ##[group]Runner Image
+detect-changes	Set up job	2026-04-16T11:32:43.5804128Z Image: ubuntu-24.04
+detect-changes	Set up job	2026-04-16T11:32:43.5804601Z Version: 20260406.80.1
+detect-changes	Set up job	2026-04-16T11:32:43.5805759Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+detect-changes	Set up job	2026-04-16T11:32:43.5807895Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+detect-changes	Set up job	2026-04-16T11:32:43.5808823Z ##[endgroup]
+detect-changes	Set up job	2026-04-16T11:32:43.5811810Z ##[group]GITHUB_TOKEN Permissions
+detect-changes	Set up job	2026-04-16T11:32:43.5814261Z Actions: write
+detect-changes	Set up job	2026-04-16T11:32:43.5814917Z ArtifactMetadata: write
+detect-changes	Set up job	2026-04-16T11:32:43.5815486Z Attestations: write
+detect-changes	Set up job	2026-04-16T11:32:43.5816049Z Checks: write
+detect-changes	Set up job	2026-04-16T11:32:43.5816546Z Contents: write
+detect-changes	Set up job	2026-04-16T11:32:43.5817012Z Deployments: write
+detect-changes	Set up job	2026-04-16T11:32:43.5817559Z Discussions: write
+detect-changes	Set up job	2026-04-16T11:32:43.5818074Z Issues: write
+detect-changes	Set up job	2026-04-16T11:32:43.5818551Z Metadata: read
+detect-changes	Set up job	2026-04-16T11:32:43.5819026Z Models: read
+detect-changes	Set up job	2026-04-16T11:32:43.5819520Z Packages: write
+detect-changes	Set up job	2026-04-16T11:32:43.5820009Z Pages: write
+detect-changes	Set up job	2026-04-16T11:32:43.5820824Z PullRequests: write
+detect-changes	Set up job	2026-04-16T11:32:43.5821419Z RepositoryProjects: write
+detect-changes	Set up job	2026-04-16T11:32:43.5821939Z SecurityEvents: write
+detect-changes	Set up job	2026-04-16T11:32:43.5822493Z Statuses: write
+detect-changes	Set up job	2026-04-16T11:32:43.5822963Z ##[endgroup]
+detect-changes	Set up job	2026-04-16T11:32:43.5825166Z Secret source: Actions
+detect-changes	Set up job	2026-04-16T11:32:43.5826255Z Prepare workflow directory
+detect-changes	Set up job	2026-04-16T11:32:43.6163711Z Prepare all required actions
+detect-changes	Set up job	2026-04-16T11:32:43.6202465Z Getting action download info
+detect-changes	Set up job	2026-04-16T11:32:43.9617765Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+detect-changes	Set up job	2026-04-16T11:32:44.1970437Z Complete job name: detect-changes
+detect-changes	Run actions/checkout@v4	﻿2026-04-16T11:32:44.2723342Z ##[group]Run actions/checkout@v4
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2724275Z with:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2724697Z   fetch-depth: 2
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2725164Z   repository: link-foundation/log-lazy
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2725876Z   token: ***
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2726294Z   ssh-strict: true
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2726715Z   ssh-user: git
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2727287Z   persist-credentials: true
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2727968Z   clean: true
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2728538Z   sparse-checkout-cone-mode: true
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2729171Z   fetch-tags: false
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2729591Z   show-progress: true
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2730055Z   lfs: false
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2730643Z   submodules: false
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2731078Z   set-safe-directory: true
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.2731891Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3834003Z Syncing repository: link-foundation/log-lazy
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3835998Z ##[group]Getting Git version info
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3836778Z Working directory is '/home/runner/work/log-lazy/log-lazy'
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3837809Z [command]/usr/bin/git version
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3882024Z git version 2.53.0
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3907787Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3922677Z Temporarily overriding HOME='/home/runner/work/_temp/de39d070-3cc0-4fc4-9160-526fd07f0bfb' before making global git config changes
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3925484Z Adding repository directory to the temporary git global config as a safe directory
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3927571Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/log-lazy/log-lazy
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3958296Z Deleting the contents of '/home/runner/work/log-lazy/log-lazy'
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3962269Z ##[group]Initializing the repository
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.3966061Z [command]/usr/bin/git init /home/runner/work/log-lazy/log-lazy
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4065084Z hint: Using 'master' as the name for the initial branch. This default branch name
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4067929Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4069446Z hint: to use in all of your new repositories, which will suppress this warning,
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4070912Z hint: call:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4071517Z hint:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4072661Z hint: 	git config --global init.defaultBranch <name>
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4073785Z hint:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4074818Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4076413Z hint: 'development'. The just-created branch can be renamed via this command:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4077515Z hint:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4078232Z hint: 	git branch -m <name>
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4079058Z hint:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4080440Z hint: Disable this message with "git config set advice.defaultBranchName false"
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4082040Z Initialized empty Git repository in /home/runner/work/log-lazy/log-lazy/.git/
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4084030Z [command]/usr/bin/git remote add origin https://github.com/link-foundation/log-lazy
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4109507Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4110970Z ##[group]Disabling automatic garbage collection
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4113370Z [command]/usr/bin/git config --local gc.auto 0
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4141528Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4142336Z ##[group]Setting up auth
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4148055Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4177946Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4481593Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4518482Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4732613Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4761816Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.4981022Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.5013242Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.5014284Z ##[group]Fetching the repository
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.5021813Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=2 origin +e2c6fab9d52f8e9d65fb4d8628593c8fcf719099:refs/remotes/pull/9/merge
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.6983960Z From https://github.com/link-foundation/log-lazy
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.6985582Z  * [new ref]         e2c6fab9d52f8e9d65fb4d8628593c8fcf719099 -> pull/9/merge
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7014099Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7015029Z ##[group]Determining the checkout info
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7016821Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7022419Z [command]/usr/bin/git sparse-checkout disable
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7059275Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7086645Z ##[group]Checking out the ref
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7091369Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/9/merge
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7154201Z Note: switching to 'refs/remotes/pull/9/merge'.
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7155033Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7155614Z You are in 'detached HEAD' state. You can look around, make experimental
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7156680Z changes and commit them, and you can discard any commits you make in this
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7157887Z state without impacting any branches by switching back to a branch.
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7159415Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7160442Z If you want to create a new branch to retain commits you create, you may
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7162269Z do so (now or later) by using -c with the switch command. Example:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7163330Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7163778Z   git switch -c <new-branch-name>
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7164513Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7164933Z Or undo this operation with:
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7165589Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7165963Z   git switch -
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7166460Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7167225Z Turn off this advice by setting config variable advice.detachedHead to false
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7168475Z
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7169824Z HEAD is now at e2c6fab Merge 7d9c4293b116497148bdf6c620335b596add8f00 into e877bf4bf9de8ff12e3171081377456b5c530b17
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7173589Z ##[endgroup]
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7201460Z [command]/usr/bin/git log -1 --format=%H
+detect-changes	Run actions/checkout@v4	2026-04-16T11:32:44.7223799Z e2c6fab9d52f8e9d65fb4d8628593c8fcf719099
+detect-changes	Detect changes	﻿2026-04-16T11:32:44.7440902Z ##[group]Run # For PRs, compare against base branch; for pushes, compare with previous commit
+detect-changes	Detect changes	2026-04-16T11:32:44.7442269Z [36;1m# For PRs, compare against base branch; for pushes, compare with previous commit[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7443111Z [36;1mEVENT_NAME="pull_request"[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7443683Z [36;1mif [ "$EVENT_NAME" = "pull_request" ]; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7444387Z [36;1m  BASE_SHA="e877bf4bf9de8ff12e3171081377456b5c530b17"[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7445134Z [36;1m  HEAD_SHA="7d9c4293b116497148bdf6c620335b596add8f00"[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7445783Z [36;1m  git fetch origin $BASE_SHA[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7446596Z [36;1m  CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA 2>/dev/null || echo "")[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7447392Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7448140Z [36;1m  CHANGED_FILES=$(git diff --name-only HEAD^ HEAD 2>/dev/null || git ls-tree --name-only -r HEAD)[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7449007Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7449402Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7449830Z [36;1mecho "Changed files:"[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7450611Z [36;1mecho "$CHANGED_FILES"[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7451094Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7451530Z [36;1m# Check for JavaScript file changes[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7452239Z [36;1mif echo "$CHANGED_FILES" | grep -qE '\.(js|mjs|cjs)$'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7452946Z [36;1m  echo "js=true" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7453486Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7453919Z [36;1m  echo "js=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7454456Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7454822Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7455229Z [36;1m# Check for Markdown file changes[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7455855Z [36;1mif echo "$CHANGED_FILES" | grep -q '\.md$'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7456501Z [36;1m  echo "md=true" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7457035Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7457457Z [36;1m  echo "md=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7457988Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7458368Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7458788Z [36;1m# Check for package.json changes[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7459455Z [36;1mif echo "$CHANGED_FILES" | grep -q '^package\.json$'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7460387Z [36;1m  echo "package=true" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7460955Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7461411Z [36;1m  echo "package=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7461973Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7462339Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7462737Z [36;1m# Check for workflow changes[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7463400Z [36;1mif echo "$CHANGED_FILES" | grep -q '\.github/workflows/'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7464123Z [36;1m  echo "workflow=true" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7464666Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7465113Z [36;1m  echo "workflow=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7465664Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7466102Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7466610Z [36;1m# Check if ONLY documentation changed (no code changes)[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7467617Z [36;1mif echo "$CHANGED_FILES" | grep -v '\.md$' | grep -q '.'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7468346Z [36;1m  echo "docs-only=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7468906Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7469326Z [36;1m  # All changed files are .md files[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7470055Z [36;1m  if [ -n "$CHANGED_FILES" ] && echo "$CHANGED_FILES" | grep -q '\.md$'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7471162Z [36;1m    echo "docs-only=true" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7471739Z [36;1m  else[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7472189Z [36;1m    echo "docs-only=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7472740Z [36;1m  fi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7473109Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7473475Z [36;1m[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7473997Z [36;1m# Check for any code changes (excluding pure documentation)[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7474976Z [36;1mif echo "$CHANGED_FILES" | grep -qE '\.(js|mjs|cjs|ts|json|yml|yaml)$|\.github/workflows/'; then[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7476073Z [36;1m  echo "code=true" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7476607Z [36;1melse[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7477042Z [36;1m  echo "code=false" >> $GITHUB_OUTPUT[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7477614Z [36;1mfi[0m
+detect-changes	Detect changes	2026-04-16T11:32:44.7503371Z shell: /usr/bin/bash -e {0}
+detect-changes	Detect changes	2026-04-16T11:32:44.7503930Z ##[endgroup]
+detect-changes	Detect changes	2026-04-16T11:32:44.9102314Z From https://github.com/link-foundation/log-lazy
+detect-changes	Detect changes	2026-04-16T11:32:44.9111669Z  * branch            e877bf4bf9de8ff12e3171081377456b5c530b17 -> FETCH_HEAD
+detect-changes	Detect changes	2026-04-16T11:32:44.9168461Z Changed files:
+detect-changes	Detect changes	2026-04-16T11:32:44.9169381Z .gitkeep
+detect-changes	Post Run actions/checkout@v4	﻿2026-04-16T11:32:44.9415317Z Post job cleanup.
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0377299Z [command]/usr/bin/git version
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0421861Z git version 2.53.0
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0519204Z Temporarily overriding HOME='/home/runner/work/_temp/b84b9fbb-539a-4f20-92c6-d04c56159dd4' before making global git config changes
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0522434Z Adding repository directory to the temporary git global config as a safe directory
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0524983Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/log-lazy/log-lazy
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0528380Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0555045Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0795559Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0818447Z http.https://github.com/.extraheader
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0831741Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.0862664Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.1080864Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+detect-changes	Post Run actions/checkout@v4	2026-04-16T11:32:45.1112012Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+detect-changes	Complete job	﻿2026-04-16T11:32:45.1547766Z Evaluate and set job outputs
+detect-changes	Complete job	2026-04-16T11:32:45.1557682Z Set output 'docs-only'
+detect-changes	Complete job	2026-04-16T11:32:45.1560935Z Set output 'js-changed'
+detect-changes	Complete job	2026-04-16T11:32:45.1562763Z Set output 'md-changed'
+detect-changes	Complete job	2026-04-16T11:32:45.1564285Z Set output 'package-changed'
+detect-changes	Complete job	2026-04-16T11:32:45.1565884Z Set output 'workflow-changed'
+detect-changes	Complete job	2026-04-16T11:32:45.1567472Z Set output 'any-code-changed'
+detect-changes	Complete job	2026-04-16T11:32:45.1569548Z Cleaning up orphan processes
+detect-changes	Complete job	2026-04-16T11:32:45.2009042Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+version-check	Set up job	﻿2026-04-16T11:32:49.6994501Z Current runner version: '2.333.1'
+version-check	Set up job	2026-04-16T11:32:49.7018163Z ##[group]Runner Image Provisioner
+version-check	Set up job	2026-04-16T11:32:49.7019009Z Hosted Compute Agent
+version-check	Set up job	2026-04-16T11:32:49.7019743Z Version: 20260213.493
+version-check	Set up job	2026-04-16T11:32:49.7020378Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+version-check	Set up job	2026-04-16T11:32:49.7021135Z Build Date: 2026-02-13T00:28:41Z
+version-check	Set up job	2026-04-16T11:32:49.7021954Z Worker ID: {9b1c1c48-4a8c-4e66-9cb1-0c80eee8802e}
+version-check	Set up job	2026-04-16T11:32:49.7022710Z Azure Region: westus
+version-check	Set up job	2026-04-16T11:32:49.7023285Z ##[endgroup]
+version-check	Set up job	2026-04-16T11:32:49.7024712Z ##[group]Operating System
+version-check	Set up job	2026-04-16T11:32:49.7025432Z Ubuntu
+version-check	Set up job	2026-04-16T11:32:49.7025952Z 24.04.4
+version-check	Set up job	2026-04-16T11:32:49.7026930Z LTS
+version-check	Set up job	2026-04-16T11:32:49.7027427Z ##[endgroup]
+version-check	Set up job	2026-04-16T11:32:49.7028023Z ##[group]Runner Image
+version-check	Set up job	2026-04-16T11:32:49.7028618Z Image: ubuntu-24.04
+version-check	Set up job	2026-04-16T11:32:49.7029190Z Version: 20260406.80.1
+version-check	Set up job	2026-04-16T11:32:49.7030188Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+version-check	Set up job	2026-04-16T11:32:49.7031964Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+version-check	Set up job	2026-04-16T11:32:49.7032958Z ##[endgroup]
+version-check	Set up job	2026-04-16T11:32:49.7035794Z ##[group]GITHUB_TOKEN Permissions
+version-check	Set up job	2026-04-16T11:32:49.7038145Z Actions: write
+version-check	Set up job	2026-04-16T11:32:49.7038879Z ArtifactMetadata: write
+version-check	Set up job	2026-04-16T11:32:49.7039514Z Attestations: write
+version-check	Set up job	2026-04-16T11:32:49.7040107Z Checks: write
+version-check	Set up job	2026-04-16T11:32:49.7040626Z Contents: write
+version-check	Set up job	2026-04-16T11:32:49.7041276Z Deployments: write
+version-check	Set up job	2026-04-16T11:32:49.7041844Z Discussions: write
+version-check	Set up job	2026-04-16T11:32:49.7042454Z Issues: write
+version-check	Set up job	2026-04-16T11:32:49.7043048Z Metadata: read
+version-check	Set up job	2026-04-16T11:32:49.7043622Z Models: read
+version-check	Set up job	2026-04-16T11:32:49.7044170Z Packages: write
+version-check	Set up job	2026-04-16T11:32:49.7044769Z Pages: write
+version-check	Set up job	2026-04-16T11:32:49.7045423Z PullRequests: write
+version-check	Set up job	2026-04-16T11:32:49.7046353Z RepositoryProjects: write
+version-check	Set up job	2026-04-16T11:32:49.7047158Z SecurityEvents: write
+version-check	Set up job	2026-04-16T11:32:49.7047731Z Statuses: write
+version-check	Set up job	2026-04-16T11:32:49.7048308Z ##[endgroup]
+version-check	Set up job	2026-04-16T11:32:49.7050443Z Secret source: Actions
+version-check	Set up job	2026-04-16T11:32:49.7051177Z Prepare workflow directory
+version-check	Set up job	2026-04-16T11:32:49.7382885Z Prepare all required actions
+version-check	Set up job	2026-04-16T11:32:49.7421134Z Getting action download info
+version-check	Set up job	2026-04-16T11:32:50.1551864Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+version-check	Set up job	2026-04-16T11:32:50.3833143Z Complete job name: version-check
+version-check	Run actions/checkout@v4	﻿2026-04-16T11:32:50.4532218Z ##[group]Run actions/checkout@v4
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4533116Z with:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4533531Z   repository: link-foundation/log-lazy
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4534187Z   token: ***
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4534563Z   ssh-strict: true
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4534949Z   ssh-user: git
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4535337Z   persist-credentials: true
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4536312Z   clean: true
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4536768Z   sparse-checkout-cone-mode: true
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4537466Z   fetch-depth: 1
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4537840Z   fetch-tags: false
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4538226Z   show-progress: true
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4538637Z   lfs: false
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4538992Z   submodules: false
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4539376Z   set-safe-directory: true
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.4540088Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5597764Z Syncing repository: link-foundation/log-lazy
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5599500Z ##[group]Getting Git version info
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5600190Z Working directory is '/home/runner/work/log-lazy/log-lazy'
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5601303Z [command]/usr/bin/git version
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5649567Z git version 2.53.0
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5674764Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5688546Z Temporarily overriding HOME='/home/runner/work/_temp/7e593dd5-5cfa-46fc-a3cf-11d2fa67893b' before making global git config changes
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5689946Z Adding repository directory to the temporary git global config as a safe directory
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5693370Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/log-lazy/log-lazy
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5722826Z Deleting the contents of '/home/runner/work/log-lazy/log-lazy'
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5726525Z ##[group]Initializing the repository
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5730411Z [command]/usr/bin/git init /home/runner/work/log-lazy/log-lazy
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5817168Z hint: Using 'master' as the name for the initial branch. This default branch name
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5819058Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5820031Z hint: to use in all of your new repositories, which will suppress this warning,
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5820725Z hint: call:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5821070Z hint:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5821535Z hint: 	git config --global init.defaultBranch <name>
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5822148Z hint:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5822719Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5823849Z hint: 'development'. The just-created branch can be renamed via this command:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5824993Z hint:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5825390Z hint: 	git branch -m <name>
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5825824Z hint:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5826703Z hint: Disable this message with "git config set advice.defaultBranchName false"
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5827643Z Initialized empty Git repository in /home/runner/work/log-lazy/log-lazy/.git/
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5829869Z [command]/usr/bin/git remote add origin https://github.com/link-foundation/log-lazy
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5859609Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5860326Z ##[group]Disabling automatic garbage collection
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5863629Z [command]/usr/bin/git config --local gc.auto 0
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5891100Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5892143Z ##[group]Setting up auth
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5897698Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.5926529Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6203718Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6232009Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6443391Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6471721Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6686945Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6721309Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6722541Z ##[group]Fetching the repository
+version-check	Run actions/checkout@v4	2026-04-16T11:32:50.6731842Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e2c6fab9d52f8e9d65fb4d8628593c8fcf719099:refs/remotes/pull/9/merge
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1457736Z From https://github.com/link-foundation/log-lazy
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1458832Z  * [new ref]         e2c6fab9d52f8e9d65fb4d8628593c8fcf719099 -> pull/9/merge
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1486328Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1487509Z ##[group]Determining the checkout info
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1489063Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1494642Z [command]/usr/bin/git sparse-checkout disable
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1531849Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1556456Z ##[group]Checking out the ref
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1560113Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/9/merge
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1621844Z Note: switching to 'refs/remotes/pull/9/merge'.
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1622989Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1623625Z You are in 'detached HEAD' state. You can look around, make experimental
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1625084Z changes and commit them, and you can discard any commits you make in this
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1626716Z state without impacting any branches by switching back to a branch.
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1627494Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1627864Z If you want to create a new branch to retain commits you create, you may
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1628649Z do so (now or later) by using -c with the switch command. Example:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1629099Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1629286Z   git switch -c <new-branch-name>
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1629833Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1630145Z Or undo this operation with:
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1630619Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1630825Z   git switch -
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1631050Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1631423Z Turn off this advice by setting config variable advice.detachedHead to false
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1631945Z
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1632547Z HEAD is now at e2c6fab Merge 7d9c4293b116497148bdf6c620335b596add8f00 into e877bf4bf9de8ff12e3171081377456b5c530b17
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1634669Z ##[endgroup]
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1662576Z [command]/usr/bin/git log -1 --format=%H
+version-check	Run actions/checkout@v4	2026-04-16T11:32:51.1685680Z e2c6fab9d52f8e9d65fb4d8628593c8fcf719099
+version-check	Check if version needs publishing	﻿2026-04-16T11:32:51.1904409Z ##[group]Run # Get version and package name from package.json
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1905261Z [36;1m# Get version and package name from package.json[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1906257Z [36;1mCURRENT_VERSION=$(node -p "require('./package.json').version")[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1907089Z [36;1mPACKAGE_NAME=$(node -p "require('./package.json').name")[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1907712Z [36;1m[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1908092Z [36;1mecho "Package: $PACKAGE_NAME"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1908634Z [36;1mecho "Current version: $CURRENT_VERSION"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1909284Z [36;1mecho "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1909975Z [36;1mecho "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1910542Z [36;1m[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1911036Z [36;1m# Check what version is currently published on npm[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1911877Z [36;1mNPM_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "not-found")[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1912749Z [36;1mecho "npm_version=$NPM_VERSION" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1913365Z [36;1m[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1913797Z [36;1m# For PRs, check if version is bumped[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1914421Z [36;1mif [ "pull_request" == "pull_request" ]; then[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1915069Z [36;1m  if [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1916233Z [36;1m    echo "::error::Version must be bumped for PR. Current version ($CURRENT_VERSION) is already published to npm"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1917159Z [36;1m    exit 1[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1917575Z [36;1m  fi[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1917975Z [36;1m  echo "✅ Version check passed for PR"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1918571Z [36;1m  echo "should_publish=false" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1919101Z [36;1m  exit 0[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1919447Z [36;1mfi[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1919787Z [36;1m[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1920234Z [36;1m# For main branch, check if this version exists on npm[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1921041Z [36;1mif [ "pull_request" == "push" ] && [ "refs/pull/9/merge" == "refs/heads/main" ]; then[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1921785Z [36;1m  if [ "$NPM_VERSION" = "not-found" ]; then[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1922444Z [36;1m    echo "Package not found on npm registry - will publish"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1923145Z [36;1m    echo "should_publish=true" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1923774Z [36;1m  elif [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1924468Z [36;1m    echo "Version $CURRENT_VERSION already published to npm"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1925162Z [36;1m    echo "should_publish=false" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1925695Z [36;1m  else[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1926445Z [36;1m    echo "Current version ($CURRENT_VERSION) differs from npm version ($NPM_VERSION)"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1927230Z [36;1m    echo "Will publish new version"[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1927810Z [36;1m    echo "should_publish=true" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1928538Z [36;1m  fi[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1928899Z [36;1melse[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1929333Z [36;1m  echo "should_publish=false" >> $GITHUB_OUTPUT[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1929860Z [36;1mfi[0m
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1954192Z shell: /usr/bin/bash -e {0}
+version-check	Check if version needs publishing	2026-04-16T11:32:51.1954749Z ##[endgroup]
+version-check	Check if version needs publishing	2026-04-16T11:32:52.0656991Z Package: log-lazy
+version-check	Check if version needs publishing	2026-04-16T11:32:52.0657745Z Current version: 1.0.4
+version-check	Check if version needs publishing	2026-04-16T11:32:53.7614804Z ##[error]Version must be bumped for PR. Current version (1.0.4) is already published to npm
+version-check	Check if version needs publishing	2026-04-16T11:32:53.7627619Z ##[error]Process completed with exit code 1.
+version-check	Post Run actions/checkout@v4	﻿2026-04-16T11:32:53.7756428Z Post job cleanup.
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8688686Z [command]/usr/bin/git version
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8730206Z git version 2.53.0
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8774258Z Temporarily overriding HOME='/home/runner/work/_temp/645ee902-c917-4e66-ad8f-7dadb61aea61' before making global git config changes
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8775754Z Adding repository directory to the temporary git global config as a safe directory
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8780851Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/log-lazy/log-lazy
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8813815Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.8844833Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.9062270Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.9081562Z http.https://github.com/.extraheader
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.9093304Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.9122554Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.9333156Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+version-check	Post Run actions/checkout@v4	2026-04-16T11:32:53.9362189Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+version-check	Complete job	﻿2026-04-16T11:32:53.9757214Z Evaluate and set job outputs
+version-check	Complete job	2026-04-16T11:32:53.9765764Z Set output 'version'
+version-check	Complete job	2026-04-16T11:32:53.9768714Z Set output 'package_name'
+version-check	Complete job	2026-04-16T11:32:53.9769405Z Set output 'npm_version'
+version-check	Complete job	2026-04-16T11:32:53.9770141Z Cleaning up orphan processes
+version-check	Complete job	2026-04-16T11:32:54.0046937Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+summary	Set up job	﻿2026-04-16T11:32:59.2513273Z Current runner version: '2.333.1'
+summary	Set up job	2026-04-16T11:32:59.2540176Z ##[group]Runner Image Provisioner
+summary	Set up job	2026-04-16T11:32:59.2540988Z Hosted Compute Agent
+summary	Set up job	2026-04-16T11:32:59.2541658Z Version: 20260213.493
+summary	Set up job	2026-04-16T11:32:59.2542236Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+summary	Set up job	2026-04-16T11:32:59.2543011Z Build Date: 2026-02-13T00:28:41Z
+summary	Set up job	2026-04-16T11:32:59.2543689Z Worker ID: {f937d629-75e6-4da6-a397-7d4564d618d8}
+summary	Set up job	2026-04-16T11:32:59.2544388Z Azure Region: northcentralus
+summary	Set up job	2026-04-16T11:32:59.2545051Z ##[endgroup]
+summary	Set up job	2026-04-16T11:32:59.2547126Z ##[group]Operating System
+summary	Set up job	2026-04-16T11:32:59.2547749Z Ubuntu
+summary	Set up job	2026-04-16T11:32:59.2548171Z 24.04.4
+summary	Set up job	2026-04-16T11:32:59.2548827Z LTS
+summary	Set up job	2026-04-16T11:32:59.2549266Z ##[endgroup]
+summary	Set up job	2026-04-16T11:32:59.2549965Z ##[group]Runner Image
+summary	Set up job	2026-04-16T11:32:59.2550505Z Image: ubuntu-24.04
+summary	Set up job	2026-04-16T11:32:59.2551023Z Version: 20260406.80.1
+summary	Set up job	2026-04-16T11:32:59.2552072Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260406.80/images/ubuntu/Ubuntu2404-Readme.md
+summary	Set up job	2026-04-16T11:32:59.2553683Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260406.80
+summary	Set up job	2026-04-16T11:32:59.2554716Z ##[endgroup]
+summary	Set up job	2026-04-16T11:32:59.2557771Z ##[group]GITHUB_TOKEN Permissions
+summary	Set up job	2026-04-16T11:32:59.2560334Z Actions: write
+summary	Set up job	2026-04-16T11:32:59.2560979Z ArtifactMetadata: write
+summary	Set up job	2026-04-16T11:32:59.2561508Z Attestations: write
+summary	Set up job	2026-04-16T11:32:59.2562055Z Checks: write
+summary	Set up job	2026-04-16T11:32:59.2562616Z Contents: write
+summary	Set up job	2026-04-16T11:32:59.2563098Z Deployments: write
+summary	Set up job	2026-04-16T11:32:59.2563644Z Discussions: write
+summary	Set up job	2026-04-16T11:32:59.2564175Z Issues: write
+summary	Set up job	2026-04-16T11:32:59.2564672Z Metadata: read
+summary	Set up job	2026-04-16T11:32:59.2565121Z Models: read
+summary	Set up job	2026-04-16T11:32:59.2565739Z Packages: write
+summary	Set up job	2026-04-16T11:32:59.2566501Z Pages: write
+summary	Set up job	2026-04-16T11:32:59.2567110Z PullRequests: write
+summary	Set up job	2026-04-16T11:32:59.2567785Z RepositoryProjects: write
+summary	Set up job	2026-04-16T11:32:59.2568324Z SecurityEvents: write
+summary	Set up job	2026-04-16T11:32:59.2568831Z Statuses: write
+summary	Set up job	2026-04-16T11:32:59.2569358Z ##[endgroup]
+summary	Set up job	2026-04-16T11:32:59.2571447Z Secret source: Actions
+summary	Set up job	2026-04-16T11:32:59.2572130Z Prepare workflow directory
+summary	Set up job	2026-04-16T11:32:59.2918658Z Prepare all required actions
+summary	Set up job	2026-04-16T11:32:59.3019608Z Complete job name: summary
+summary	Workflow Summary	﻿2026-04-16T11:32:59.3788758Z ##[group]Run echo "## Workflow Summary"
+summary	Workflow Summary	2026-04-16T11:32:59.3789783Z [36;1mecho "## Workflow Summary"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3790381Z [36;1mecho ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3790944Z [36;1mecho "### Event Information"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3791531Z [36;1mecho "- Event: pull_request"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3792209Z [36;1mecho "- Branch: 9/merge"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3792933Z [36;1mecho "- Commit: e2c6fab9d52f8e9d65fb4d8628593c8fcf719099"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3793611Z [36;1mecho ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3794155Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3794637Z [36;1mecho "### Change Detection"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3795257Z [36;1mecho "- Documentation only: false"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3796388Z [36;1mecho "- JavaScript changed: false"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3797162Z [36;1mecho "- Markdown changed: false"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3797784Z [36;1mecho "- Any code changed: false"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3798425Z [36;1mecho ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3798936Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3799502Z [36;1mecho "### Job Results"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3800125Z [36;1mecho "- File Line Limits: skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3800694Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3801203Z [36;1mif [ "false" == "true" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3801899Z [36;1m  echo "- Documentation Validation: skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3802557Z [36;1m  echo ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3803455Z [36;1m  echo "📝 **Note:** Only documentation changed. Skipping code-related jobs (tests, benchmarks, linting)."[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3804437Z [36;1melse[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3804941Z [36;1m  echo "- Version Check: failure"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3805604Z [36;1m  echo "- Tests (Bun/Node/Deno): skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3806664Z [36;1m  echo "- Benchmarks: skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3807574Z [36;1m  echo "- Lint & Type Check: skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3808243Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3808706Z [36;1m  if [ "false" == "true" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3809392Z [36;1m    echo "- Documentation Validation: skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3810082Z [36;1m  fi[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3810556Z [36;1mfi[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3811043Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3811721Z [36;1mif [ "pull_request" == "push" ] && [ "refs/pull/9/merge" == "refs/heads/main" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3812597Z [36;1m  echo "- Publish: skipped"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3813148Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3813644Z [36;1m  if [ "" == "true" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3814263Z [36;1m    echo ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3814749Z [36;1m    echo "### 📦 Publishing"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3815387Z [36;1m    echo "- Package: log-lazy"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3816286Z [36;1m    echo "- Version: 1.0.4"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3816962Z [36;1m    if [ "skipped" == "success" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3817647Z [36;1m      echo "- Status: ✅ Published successfully!"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3818612Z [36;1m      echo "- View on NPM: https://www.npmjs.com/package/log-lazy/v/1.0.4"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3819481Z [36;1m    elif [ "skipped" == "skipped" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3820344Z [36;1m      echo "- Status: ⏭️ Skipped (version already published or docs-only change)"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3821181Z [36;1m    else[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3821657Z [36;1m      echo "- Status: ❌ Failed"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3822265Z [36;1m    fi[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3822770Z [36;1m  else[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3823209Z [36;1m    echo ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3823788Z [36;1m    echo "### 📦 Publishing"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3824532Z [36;1m    echo "- Status: ⏭️ Skipped (no version change or docs-only change)"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3825290Z [36;1m  fi[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3826005Z [36;1mfi[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3826502Z [36;1m[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3827076Z [36;1mif [ "pull_request" == "pull_request" ]; then[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3897269Z [36;1m  echo ""[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3898264Z [36;1m  echo "### Pull Request Check"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3899236Z [36;1m  echo "All checks completed for PR #9"[0m
+summary	Workflow Summary	2026-04-16T11:32:59.3900661Z [36;1mfi[0m
+summary	Workflow Summary	2026-04-16T11:32:59.4252399Z shell: /usr/bin/bash -e {0}
+summary	Workflow Summary	2026-04-16T11:32:59.4253693Z ##[endgroup]
+summary	Workflow Summary	2026-04-16T11:32:59.4527598Z ## Workflow Summary
+summary	Workflow Summary	2026-04-16T11:32:59.4528139Z
+summary	Workflow Summary	2026-04-16T11:32:59.4528459Z ### Event Information
+summary	Workflow Summary	2026-04-16T11:32:59.4529245Z - Event: pull_request
+summary	Workflow Summary	2026-04-16T11:32:59.4530076Z - Branch: 9/merge
+summary	Workflow Summary	2026-04-16T11:32:59.4530925Z - Commit: e2c6fab9d52f8e9d65fb4d8628593c8fcf719099
+summary	Workflow Summary	2026-04-16T11:32:59.4531724Z
+summary	Workflow Summary	2026-04-16T11:32:59.4532079Z ### Change Detection
+summary	Workflow Summary	2026-04-16T11:32:59.4532950Z - Documentation only: false
+summary	Workflow Summary	2026-04-16T11:32:59.4533809Z - JavaScript changed: false
+summary	Workflow Summary	2026-04-16T11:32:59.4534643Z - Markdown changed: false
+summary	Workflow Summary	2026-04-16T11:32:59.4535447Z - Any code changed: false
+summary	Workflow Summary	2026-04-16T11:32:59.4536440Z
+summary	Workflow Summary	2026-04-16T11:32:59.4536850Z ### Job Results
+summary	Workflow Summary	2026-04-16T11:32:59.4537546Z - File Line Limits: skipped
+summary	Workflow Summary	2026-04-16T11:32:59.4538343Z - Version Check: failure
+summary	Workflow Summary	2026-04-16T11:32:59.4539093Z - Tests (Bun/Node/Deno): skipped
+summary	Workflow Summary	2026-04-16T11:32:59.4539932Z - Benchmarks: skipped
+summary	Workflow Summary	2026-04-16T11:32:59.4540656Z - Lint & Type Check: skipped
+summary	Workflow Summary	2026-04-16T11:32:59.4541163Z
+summary	Workflow Summary	2026-04-16T11:32:59.4541486Z ### Pull Request Check
+summary	Workflow Summary	2026-04-16T11:32:59.4542281Z All checks completed for PR #9
+summary	Complete job	﻿2026-04-16T11:32:59.4708976Z Cleaning up orphan processes
