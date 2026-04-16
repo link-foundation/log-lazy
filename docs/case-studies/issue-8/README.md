@@ -110,15 +110,47 @@ Rust template practices observed:
 
 Adopted in this repository:
 
-- Root-level multi-language change detection.
+- Root-level multi-language change detection using reusable scripts rather than
+  inline workflow shell.
 - Fast file line limit check before test matrices.
 - JavaScript tests across Bun, Node.js, and Deno from `js/`.
 - Rust tests across Ubuntu, macOS, and Windows from `rust/`.
 - Rust formatting, Clippy with `-D warnings`, unit tests, and doc tests.
 - NPM version check updated to read `js/package.json`.
-- Manual release workflow updated to publish from `js/`.
+- NPM publish and JavaScript GitHub release creation moved into root
+  `scripts/*.mjs` helpers that understand the `js/` package root.
+- Rust crate version checks, crates.io publish, and Rust GitHub release
+  creation moved into root `scripts/*.rs` helpers that understand the `rust/`
+  crate root.
+- Rust coverage with `cargo-llvm-cov` and Codecov upload, matching the Rust
+  template's coverage practice.
+- Fresh-merge simulation now reuses `scripts/simulate-fresh-merge.sh` in both
+  language workflows.
 - Initial CI failure was resolved by bumping the npm package from `1.0.4` to
   `1.1.0`; the downloaded log showed `1.0.4` was already published.
+
+Follow-up review on PR #9 specifically asked why the PR did not reuse the
+template `scripts/` directory patterns. The follow-up implementation adds the
+adapted scripts below:
+
+- JavaScript: `js-paths.mjs`, `detect-js-changes.mjs`,
+  `check-npm-version.mjs`, `publish-to-npm.mjs`,
+  `create-js-github-release.mjs`, `check-mjs-syntax.sh`, and
+  `check-file-line-limits.sh`.
+- Shared: `simulate-fresh-merge.sh`.
+- Rust: `rust-paths.rs`, `detect-rust-changes.rs`,
+  `check-crate-version.rs`, `publish-crate.rs`,
+  `create-rust-github-release.rs`, and `check-file-size.rs`.
+
+Template features intentionally not copied as-is:
+
+- JavaScript Changesets and Rust changelog-fragment enforcement were not turned
+  on in this PR because the repository did not previously use those release
+  metadata directories and this issue already needed direct package metadata
+  changes to unblock the existing published npm version.
+- The JavaScript template's separate `links.yml` workflow was not added because
+  the reviewer requested the final workflow set to remain `js.yml` and
+  `rust.yml`; documentation validation is instead folded into `js.yml`.
 
 ## Solution Plan Chosen
 

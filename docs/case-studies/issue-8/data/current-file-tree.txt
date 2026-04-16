@@ -66,3 +66,17 @@ rust/README.md
 rust/examples/basic_usage.rs
 rust/src/lib.rs
 rust/tests/log_lazy.rs
+scripts/check-crate-version.rs
+scripts/check-file-line-limits.sh
+scripts/check-file-size.rs
+scripts/check-mjs-syntax.sh
+scripts/check-npm-version.mjs
+scripts/create-js-github-release.mjs
+scripts/create-rust-github-release.rs
+scripts/detect-js-changes.mjs
+scripts/detect-rust-changes.rs
+scripts/js-paths.mjs
+scripts/publish-crate.rs
+scripts/publish-to-npm.mjs
+scripts/rust-paths.rs
+scripts/simulate-fresh-merge.sh
