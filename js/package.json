@@ -8,7 +8,7 @@
   "scripts": {
     "test": "bun test",
     "test:bun": "bun test",
-    "test:node": "node --test tests",
+    "test:node": "node --test",
     "test:deno": "deno test --allow-read tests/ci-diagnose.test.js tests/debug.test.js tests/github-env.test.js tests/log4js.test.js tests/simple-ci.test.js tests/static-import.test.js tests/fix-attempt.test.js tests/reorder-import.test.js",
     "test:all": "./test-all.sh",
     "test:watch": "bun test --watch",

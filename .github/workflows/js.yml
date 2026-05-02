@@ -191,7 +191,7 @@ jobs:
           bun-version: latest
 
       - name: Setup Node.js
-        if: matrix.runtime == 'node'
+        if: matrix.runtime == 'node' || matrix.runtime == 'deno'
         uses: actions/setup-node@v6
         with:
           node-version: '24.x'
@@ -208,7 +208,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Install dependencies with npm
-        if: matrix.runtime == 'node'
+        if: matrix.runtime == 'node' || matrix.runtime == 'deno'
         working-directory: js
         run: npm ci
 
