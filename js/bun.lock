@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "log-lazy",
@@ -12,6 +13,7 @@
         "log4js": "^6.9.1",
         "mitata": "^1.0.34",
         "pino": "^9.10.0",
+        "test-anywhere": "^0.9.1",
         "typescript": "^5.9.2",
         "winston": "^3.17.0",
       },
@@ -295,6 +297,8 @@
     "strip-json-comments": ["strip-json-comments@3.1.1", "", {}, "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig=="],
 
     "supports-color": ["supports-color@7.2.0", "", { "dependencies": { "has-flag": "^4.0.0" } }, "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="],
+
+    "test-anywhere": ["test-anywhere@0.9.1", "", { "bin": { "test-anywhere": "bin/test-anywhere.js" } }, "sha512-sx5hEF2NqFE3VnFK0LMoVlaV/kHO5q2Tu1fHQOXH1ZTu3XRLgQBSoH+cuAODjSvz1LZNlhxfbI/lZRUP7Dfckg=="],
 
     "text-hex": ["text-hex@1.0.0", "", {}, "sha512-uuVGNWzgJ4yhRaNSiubPY7OjISw4sw4E5Uv0wbjp+OzcbmVU/rsT8ujgcXJhn9ypzsgr5vlzpPqP+MBBKcGvbg=="],
 

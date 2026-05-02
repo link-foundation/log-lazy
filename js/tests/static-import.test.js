@@ -1,5 +1,5 @@
-// Test with static import only - no dynamic imports
-import { describe, test, expect } from 'bun:test';
+// Test with static import only - no dynamic imports in this file.
+import { describe, expect, test } from './test-setup.js';
 
 console.log('[static-import] File loaded');
 console.log('[static-import] typeof describe:', typeof describe);

@@ -215,49 +215,19 @@ jobs:
       - name: Run Bun tests
         if: matrix.runtime == 'bun'
         working-directory: js
-        run: bun test
+        run: bun run test:bun
 
       - name: Run Node.js tests
         if: matrix.runtime == 'node'
         working-directory: js
         shell: bash
-        run: |
-          passed=0
-          failed=0
-          for file in tests/{bunyan,debug,log4js,pino,winston,simple-ci,fix-attempt,reorder-import}.test.js; do
-            output=$(node "$file" 2>&1 || true)
-            if echo "$output" | grep -q "0 failed" && echo "$output" | grep -q "passed"; then
-              echo "$(basename "$file"): passed"
-              passed=$((passed + 1))
-            else
-              echo "$(basename "$file"): failed"
-              echo "$output" | tail -20
-              failed=$((failed + 1))
-            fi
-          done
-          echo "Node.js tests: $passed passed, $failed failed"
-          test "$failed" -eq 0
+        run: npm run test:node
 
       - name: Run Deno tests
         if: matrix.runtime == 'deno'
         working-directory: js
         shell: bash
-        run: |
-          passed=0
-          failed=0
-          for file in tests/{debug,log4js,simple-ci,fix-attempt,reorder-import}.test.js; do
-            output=$(deno test --allow-read "$file" 2>&1 || true)
-            if echo "$output" | grep -q "0 failed" && echo "$output" | grep -q "passed"; then
-              echo "$(basename "$file"): passed"
-              passed=$((passed + 1))
-            else
-              echo "$(basename "$file"): failed"
-              echo "$output" | tail -20
-              failed=$((failed + 1))
-            fi
-          done
-          echo "Deno tests: $passed passed, $failed failed"
-          test "$failed" -eq 0
+        run: deno test --allow-read tests/ci-diagnose.test.js tests/debug.test.js tests/github-env.test.js tests/log4js.test.js tests/simple-ci.test.js tests/static-import.test.js tests/fix-attempt.test.js tests/reorder-import.test.js
 
       - name: Run coverage
         if: matrix.os == 'ubuntu-latest' && matrix.runtime == 'bun'

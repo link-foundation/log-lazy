@@ -8,7 +8,7 @@ echo
 # Bun tests
 echo "--- BUN TESTS ---"
 if command -v bun &> /dev/null; then
-    bun test
+    bun run test:bun
     BUN_EXIT=$?
     echo
 else
@@ -20,28 +20,8 @@ fi
 echo "--- NODE TESTS ---"
 if command -v node &> /dev/null; then
     echo "Testing with Node $(node --version)"
-    NODE_PASSED=0
-    NODE_FAILED=0
-    
-    for file in tests/{bunyan,debug,log4js,pino,winston,simple-ci,fix-attempt,reorder-import}.test.js; do
-        if [ -f "$file" ]; then
-            name=$(basename "$file")
-            result=$(timeout 2 node "$file" 2>&1 | grep -E "passed.*failed" | tail -1)
-            if [[ "$result" == *"0 failed"* ]] && [[ "$result" == *"passed"* ]]; then
-                echo "✓ $name: $result"
-                ((NODE_PASSED++))
-            elif [[ -n "$result" ]]; then
-                echo "✗ $name: $result"
-                ((NODE_FAILED++))
-            else
-                echo "? $name: no result"
-                ((NODE_FAILED++))
-            fi
-        fi
-    done
-    
-    echo "Node.js: $NODE_PASSED passed, $NODE_FAILED failed"
-    NODE_EXIT=$NODE_FAILED
+    npm run test:node
+    NODE_EXIT=$?
     echo
 else
     echo "Node.js not installed, skipping..."
@@ -52,25 +32,8 @@ fi
 echo "--- DENO TESTS ---"
 if command -v deno &> /dev/null; then
     echo "Testing with Deno $(deno --version | head -1)"
-    DENO_PASSED=0
-    DENO_FAILED=0
-    
-    # Tests that work with Deno's test runner
-    for file in tests/{debug,log4js,simple-ci,fix-attempt,reorder-import}.test.js; do
-        if [ -f "$file" ]; then
-            name=$(basename "$file")
-            if deno test --allow-read "$file" &> /dev/null; then
-                echo "✓ $name"
-                ((DENO_PASSED++))
-            else
-                echo "✗ $name"
-                ((DENO_FAILED++))
-            fi
-        fi
-    done
-    
-    echo "Deno: $DENO_PASSED passed, $DENO_FAILED failed"
-    DENO_EXIT=$DENO_FAILED
+    npm run test:deno
+    DENO_EXIT=$?
     echo
 else
     echo "Deno not installed, skipping..."
@@ -79,7 +42,7 @@ fi
 
 # TypeScript definitions test
 echo "--- TYPESCRIPT DEFINITIONS ---"
-if command -v tsc &> /dev/null; then
+if command -v bun &> /dev/null; then
     echo "Testing TypeScript definitions..."
     if bun run test:types &> /dev/null; then
         echo "✓ TypeScript definitions valid"
@@ -89,8 +52,18 @@ if command -v tsc &> /dev/null; then
         TS_EXIT=1
     fi
     echo
+elif command -v npm &> /dev/null; then
+    echo "Testing TypeScript definitions..."
+    if npm run test:types &> /dev/null; then
+        echo "✓ TypeScript definitions valid"
+        TS_EXIT=0
+    else
+        echo "✗ TypeScript definitions failed"
+        TS_EXIT=1
+    fi
+    echo
 else
-    echo "TypeScript not installed, skipping..."
+    echo "No package runner available, skipping..."
     TS_EXIT=0
 fi
 

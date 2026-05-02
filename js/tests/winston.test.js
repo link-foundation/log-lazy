@@ -1,29 +1,9 @@
 /* eslint-env node */
-/* global describe, test, expect, beforeEach, jest */
 
-// For Bun: test functions are globals - use them directly
-// For Node/Deno: import from test-setup.js
-
+import { beforeEach, describe, expect, mock, test } from './test-setup.js';
 import makeLog from '../src/index.js';
 import winston from 'winston';
 import Transport from 'winston-transport';
-
-// Runtime detection and setup
-if (typeof Bun === 'undefined') {
-  // Only import for non-Bun environments
-  const testModule = await import('./test-setup.js');
-  globalThis.describe = testModule.describe;
-  globalThis.test = testModule.test;
-  globalThis.expect = testModule.expect;
-  globalThis.mock = testModule.mock;
-  globalThis.spyOn = testModule.spyOn;
-  globalThis.beforeEach = testModule.beforeEach;
-  globalThis.afterEach = testModule.afterEach;
-}
-
-// In Bun, use jest.fn and jest.spyOn for mocking
-const mock = typeof Bun !== 'undefined' ? jest.fn : globalThis.mock;
-const _spyOn = typeof Bun !== 'undefined' ? jest.spyOn : globalThis.spyOn;
 
 class MockTransport extends Transport {
   constructor(opts) {
