@@ -1,0 +1,11 @@
+log4rs #log #logger #logging #log4
+A highly configurable multi-output logging implementation for the `log` facade
+version: 1.4.0
+license: MIT OR Apache-2.0
+rust-version: 1.75
+documentation: https://docs.rs/log4rs/1.4.0
+repository: https://github.com/estk/log4rs
+crates.io: https://crates.io/crates/log4rs/1.4.0
+features:
+  32 activated features
+  8 deactivated features

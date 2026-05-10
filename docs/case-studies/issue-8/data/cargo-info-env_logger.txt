@@ -1,0 +1,17 @@
+env_logger #logging #log #logger
+A logging implementation for `log` which is configured via an environment
+variable.
+version: 0.11.10
+license: MIT OR Apache-2.0
+rust-version: 1.71
+documentation: https://docs.rs/env_logger/0.11.10
+repository: https://github.com/rust-cli/env_logger
+crates.io: https://crates.io/crates/env_logger/0.11.10
+features:
+ +default     = [auto-color, humantime, regex]
+  auto-color  = [color, anstream/auto]
+  color       = [dep:anstream, dep:anstyle]
+  humantime   = [dep:jiff]
+  regex       = [env_filter/regex]
+  kv          = [log/kv]
+  unstable-kv = [kv]

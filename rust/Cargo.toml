@@ -1,0 +1,22 @@
+[package]
+name = "log-lazy"
+version = "0.2.0"
+edition = "2021"
+description = "A lazy logging library with bitwise level control"
+readme = "README.md"
+license = "Unlicense"
+keywords = ["logging", "lazy", "bitwise", "performance"]
+categories = ["development-tools::debugging"]
+repository = "https://github.com/link-foundation/log-lazy"
+documentation = "https://docs.rs/log-lazy"
+rust-version = "1.70"
+
+[lib]
+name = "log_lazy"
+path = "src/lib.rs"
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+[lints.rust]
+unsafe_code = "forbid"

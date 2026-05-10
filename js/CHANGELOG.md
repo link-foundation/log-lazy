@@ -1,0 +1,59 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+### Added
+- Preprocessors system for transforming arguments before processing
+- Postprocessors system for transforming compiled messages before output
+- Built-in preprocessor helpers: `addContext`, `filter`, `map`
+- Built-in postprocessor helpers: `timestamp`, `level`, `pid`, `prefix`, `suffix`
+- Support for configurable prefixes (timestamps, log levels, process IDs)
+- Single-options callback API for custom and built-in processors
+- Zero-overhead implementation when no processors are configured
+
+## [1.1.0] - 2026-04-16
+### Added
+- Multi-language repository layout with JavaScript package files under `js/`.
+- Rust crate implementation under `rust/` with lazy closures, bitwise levels,
+  custom sinks, custom presets, and lazy formatting macros.
+- CI/CD checks for both JavaScript and Rust packages.
+
+## [1.0.0] - TBD
+### Added
+- Full cross-runtime support (Bun, Node.js v20+, Deno)
+- Cross-platform testing (Ubuntu, macOS, Windows)
+- TypeScript definitions
+- Complete test coverage (100%)
+- Integration examples with popular loggers (Winston, Bunyan, Pino, Log4js, Debug)
+
+### Changed
+- Stabilized API for 1.0 release
+- Improved documentation with more examples
+- Enhanced CI/CD pipeline for automated publishing
+
+### Fixed
+- Test compatibility issues across different runtimes
+- CI/CD platform-specific issues
+
+## [0.0.3] - 2024-09-20
+### Fixed
+- Test infrastructure for cross-runtime compatibility
+- GitHub Actions workflow for all platforms
+
+## [0.0.2] - 2024-09-20
+### Added
+- Basic logging functionality with bitwise level control
+- Lazy evaluation support
+- Integration with popular logging libraries
+- Comprehensive test suite
+- Benchmarks showing performance benefits
+
+## [0.0.1] - 2024-09-19
+### Added
+- Initial release
+- Core logging functionality
+- Basic level management

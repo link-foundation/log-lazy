@@ -1,4 +1,4 @@
-import makeLog, { postprocessors, preprocessors } from '../src/index.js';
+import makeLog, { postprocessors, preprocessors } from '../js/src/index.js';
 
 console.log('=== Preprocessor and Postprocessor Experiments ===\n');
 
@@ -6,7 +6,7 @@ console.log('=== Preprocessor and Postprocessor Experiments ===\n');
 console.log('1. Basic timestamp postprocessor:');
 const log1 = makeLog({
   level: 'info',
-  postprocessors: [postprocessors.timestamp('iso')]
+  postprocessors: [postprocessors.timestamp({ format: 'iso' })]
 });
 log1('Server started on port 3000');
 console.log();
@@ -17,7 +17,7 @@ const log2 = makeLog({
   level: 'all',
   postprocessors: [
     postprocessors.level(),
-    postprocessors.timestamp('time')
+    postprocessors.timestamp({ format: 'time' })
   ]
 });
 log2.info('User logged in');
@@ -30,8 +30,8 @@ console.log('3. Custom prefix and suffix:');
 const log3 = makeLog({
   level: 'info',
   postprocessors: [
-    postprocessors.prefix('[MyApp]'),
-    postprocessors.suffix('✓')
+    postprocessors.prefix({ text: '[MyApp]' }),
+    postprocessors.suffix({ text: '[ok]' })
   ]
 });
 log3('Payment processed successfully');
@@ -54,7 +54,9 @@ console.log('5. Preprocessor adding context:');
 const log5 = makeLog({
   level: 'info',
   preprocessors: [
-    preprocessors.addContext({ requestId: 'req-12345' })
+    preprocessors.addContext({
+      context: { requestId: 'req-12345' }
+    })
   ]
 });
 log5('Processing request');
@@ -65,12 +67,14 @@ console.log('6. Preprocessor filtering sensitive data:');
 const log6 = makeLog({
   level: 'info',
   preprocessors: [
-    preprocessors.filter(arg => {
-      // Filter out objects with 'password' property
-      if (typeof arg === 'object' && arg !== null && 'password' in arg) {
-        return false;
+    preprocessors.filter({
+      predicate: ({ arg }) => {
+        // Filter out objects with 'password' property
+        if (typeof arg === 'object' && arg !== null && 'password' in arg) {
+          return false;
+        }
+        return true;
       }
-      return true;
     })
   ]
 });
@@ -82,11 +86,11 @@ console.log('7. Combining preprocessors and postprocessors:');
 const log7 = makeLog({
   level: 'all',
   preprocessors: [
-    (args) => ['[Context]', ...args]
+    ({ args }) => ['[Context]', ...args]
   ],
   postprocessors: [
     postprocessors.level(),
-    postprocessors.timestamp('ms')
+    postprocessors.timestamp({ format: 'ms' })
   ]
 });
 log7.debug('Debug information with full context');
@@ -98,7 +102,7 @@ const log8 = makeLog({
   level: 'info',
   preprocessors: [
     // Convert first arg to uppercase if it's a string
-    (args) => {
+    ({ args }) => {
       if (args.length > 0 && typeof args[0] === 'string') {
         return [args[0].toUpperCase(), ...args.slice(1)];
       }
@@ -107,7 +111,7 @@ const log8 = makeLog({
   ],
   postprocessors: [
     // Wrap in decorative box
-    (message) => `╔═══ ${message} ═══╗`
+    ({ message }) => `=== ${message} ===`
   ]
 });
 log8('important announcement', 'with details');
@@ -124,7 +128,7 @@ console.log('10. Lazy evaluation with postprocessors:');
 const log10 = makeLog({
   level: 'info',
   postprocessors: [
-    postprocessors.prefix('[LAZY]')
+    postprocessors.prefix({ text: '[LAZY]' })
   ]
 });
 
@@ -149,7 +153,7 @@ const jsonLog = makeLog({
   level: 'all',
   preprocessors: [
     // Add common fields
-    (args) => {
+    ({ args }) => {
       const metadata = {
         timestamp: new Date().toISOString(),
         service: 'api-gateway',
@@ -160,7 +164,7 @@ const jsonLog = makeLog({
   ],
   postprocessors: [
     // Format as JSON (just for demo, normally you'd keep objects)
-    (message, level, levelName) => {
+    ({ message, levelName }) => {
       return `{"level":"${levelName}","message":"${message}"}`;
     }
   ]

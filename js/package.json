@@ -1,0 +1,82 @@
+{
+  "name": "log-lazy",
+  "version": "1.1.0",
+  "description": "A lazy logging library with bitwise level control",
+  "main": "src/index.js",
+  "types": "index.d.ts",
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "test:bun": "bun test",
+    "test:node": "node --test",
+    "test:deno": "deno test --allow-read tests/ci-diagnose.test.js tests/debug.test.js tests/github-env.test.js tests/log4js.test.js tests/simple-ci.test.js tests/static-import.test.js tests/fix-attempt.test.js tests/reorder-import.test.js",
+    "test:all": "./test-all.sh",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "test:types": "tsc --noEmit tests/typescript-definitions.ts",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "bench": "bun run benchmarks/lazy-vs-traditional.bench.js && bun run benchmarks/no-logs-vs-lazy-logs.bench.js",
+    "bench:lazy": "bun run benchmarks/lazy-vs-traditional.bench.js",
+    "bench:no-logs": "bun run benchmarks/no-logs-vs-lazy-logs.bench.js"
+  },
+  "keywords": [
+    "logging",
+    "lazy",
+    "bitwise",
+    "levels",
+    "logger",
+    "performance",
+    "production",
+    "debug",
+    "trace",
+    "bun",
+    "zero-cost",
+    "lazy-evaluation",
+    "winston-compatible",
+    "bunyan-compatible",
+    "pino-compatible",
+    "log4js-compatible",
+    "cross-platform",
+    "typescript"
+  ],
+  "author": "Link Foundation",
+  "license": "Unlicense",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/link-foundation/log-lazy.git",
+    "directory": "js"
+  },
+  "bugs": {
+    "url": "https://github.com/link-foundation/log-lazy/issues"
+  },
+  "homepage": "https://github.com/link-foundation/log-lazy/tree/main/js#readme",
+  "files": [
+    "src/",
+    "index.d.ts",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@types/bun": "^1.2.22",
+    "bunyan": "^1.8.15",
+    "debug": "^4.4.3",
+    "eslint": "^9.36.0",
+    "log4js": "^6.9.1",
+    "mitata": "^1.0.34",
+    "pino": "^9.10.0",
+    "test-anywhere": "^0.9.1",
+    "typescript": "^5.9.2",
+    "winston": "^3.17.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.0.0",
+    "deno": ">=2.0.0"
+  }
+}
