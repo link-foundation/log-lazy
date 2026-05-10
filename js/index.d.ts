@@ -37,8 +37,71 @@ export interface LogOptions {
   };
   /** Custom presets for different environments */
   presets?: {
-    [key: string]: Partial<LogOptions>;
+    [key: string]: number;
   };
+  /** Preprocessors to transform arguments before processing */
+  preprocessors?: Preprocessor[];
+  /** Postprocessors to transform compiled messages before output */
+  postprocessors?: Postprocessor[];
+}
+
+export interface PreprocessorOptions {
+  args: any[];
+  level: number;
+  levelName: string;
+}
+
+export type Preprocessor = (options: PreprocessorOptions) => any[];
+
+export interface PostprocessorOptions {
+  message: string;
+  level: number;
+  levelName: string;
+}
+
+export type Postprocessor = (options: PostprocessorOptions) => string;
+
+export interface TimestampPostprocessorOptions {
+  format?: 'iso' | 'locale' | 'time' | 'ms';
+  now?: Date | string | number | (() => Date | string | number);
+}
+
+export interface LevelPostprocessorOptions {
+  transform?: (levelName: string) => string;
+}
+
+export interface PidPostprocessorOptions {
+  label?: string;
+  getPid?: () => string | number;
+}
+
+export interface TextPostprocessorOptions {
+  text: string;
+}
+
+export interface AddContextPreprocessorOptions {
+  context: any;
+  position?: 'start' | 'end';
+}
+
+export interface FilterPreprocessorOptions {
+  predicate: (options: {
+    arg: any;
+    index: number;
+    args: any[];
+    level: number;
+    levelName: string;
+  }) => boolean;
+}
+
+export interface MapPreprocessorOptions {
+  transform: (options: {
+    arg: any;
+    index: number;
+    args: any[];
+    level: number;
+    levelName: string;
+  }) => any;
 }
 
 export interface LogFunction {
@@ -106,3 +169,27 @@ export declare const defaultLog: LogFunction;
 
 /** Alias for defaultLog */
 export declare const log: LogFunction;
+
+/** Built-in postprocessor helpers */
+export declare const postprocessors: {
+  /** Add timestamp prefix with configurable format (iso, locale, time, ms) */
+  timestamp: (options?: TimestampPostprocessorOptions) => Postprocessor;
+  /** Add log level prefix */
+  level: (options?: LevelPostprocessorOptions) => Postprocessor;
+  /** Add process ID prefix */
+  pid: (options?: PidPostprocessorOptions) => Postprocessor;
+  /** Add custom text prefix */
+  prefix: (options: TextPostprocessorOptions) => Postprocessor;
+  /** Add custom text suffix */
+  suffix: (options: TextPostprocessorOptions) => Postprocessor;
+};
+
+/** Built-in preprocessor helpers */
+export declare const preprocessors: {
+  /** Add context object to all log calls */
+  addContext: (options: AddContextPreprocessorOptions) => Preprocessor;
+  /** Filter arguments based on predicate */
+  filter: (options: FilterPreprocessorOptions) => Preprocessor;
+  /** Transform all arguments */
+  map: (options: MapPreprocessorOptions) => Preprocessor;
+};

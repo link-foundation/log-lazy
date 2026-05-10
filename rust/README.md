@@ -66,3 +66,37 @@ let log = LogLazy::with_sink(levels::ALL, |level, message| {
 
 log.info(|| "service started");
 ```
+
+## Preprocessors and Postprocessors
+
+Use `LogLazyOptions` when you need a processor pipeline. Preprocessors receive
+lazy `LogArg` values before they are evaluated. Postprocessors receive the
+compiled message string immediately before the sink is called.
+
+```rust
+use log_lazy::{
+    levels, postprocessors, preprocessors, LogArg, LogLazy, LogLazyOptions,
+};
+
+let log = LogLazy::with_options(
+    LogLazyOptions::new()
+        .level(levels::ALL)
+        .preprocessor(preprocessors::add_context(
+            preprocessors::AddContextOptions::new("service=orders"),
+        ))
+        .postprocessor(postprocessors::level(
+            postprocessors::LevelOptions::new(),
+        ))
+        .postprocessor(postprocessors::prefix(
+            postprocessors::TextOptions::new("[api]"),
+        )),
+);
+
+log.emit_args(
+    "info",
+    [LogArg::from("order created"), LogArg::lazy(|| expensive_payload())],
+);
+```
+
+When no processors are configured, the existing closure-based logging path is
+used directly.

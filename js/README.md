@@ -13,6 +13,7 @@ A high-performance lazy logging library with bitwise level control, designed to 
 - **Lazy Evaluation**: Log arguments wrapped in functions are only evaluated if logging is enabled
 - **Zero Performance Impact**: Disabled logs have virtually no runtime cost
 - **Bitwise Level Control**: Combine multiple log levels with bitwise operations
+- **Processor Pipeline**: Transform raw log arguments with preprocessors and compiled messages with postprocessors
 - **Production-Ready**: Keep all logging statements in production code safely
 - **Bun.sh Optimized**: Built and tested specifically for Bun runtime
 
@@ -230,6 +231,37 @@ const log = makeLog({
   }
 });
 ```
+
+### Preprocessors and Postprocessors
+
+Preprocessors receive the raw argument list before lazy functions are evaluated.
+Postprocessors receive the compiled message string immediately before output.
+Both APIs use one options object so additional context can be added without
+changing callback arity.
+
+```javascript
+import makeLog, { postprocessors, preprocessors } from 'log-lazy';
+
+const log = makeLog({
+  level: 'all',
+  preprocessors: [
+    preprocessors.addContext({
+      context: { service: 'orders' }
+    }),
+    ({ args, levelName }) => [`[${levelName}]`, ...args]
+  ],
+  postprocessors: [
+    postprocessors.timestamp({ format: 'iso' }),
+    postprocessors.level(),
+    postprocessors.prefix({ text: '[api]' })
+  ]
+});
+
+log.info('order created');
+```
+
+If no processors are configured, `log-lazy` uses the original argument path and
+does not compile arguments into a string.
 
 ### Multiple Logger Instances
 

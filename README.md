@@ -2,7 +2,8 @@
 
 `log-lazy` is a multi-language lazy logging library. It keeps detailed logging
 statements in production code while deferring expensive message construction
-until the selected log level is enabled.
+until the selected log level is enabled. Both packages support configurable
+preprocessor and postprocessor pipelines for argument and message transforms.
 
 ## Packages
 

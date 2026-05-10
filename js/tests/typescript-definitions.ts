@@ -1,8 +1,8 @@
 // TypeScript definitions test
 // This file verifies that TypeScript definitions work correctly
 
-import makeLog, { levels, levelNames, defaultLog, log } from '../index';
-import type { LogFunction, LogLevels, LogOptions } from '../index';
+import makeLog, { levels, levelNames, defaultLog, log, postprocessors, preprocessors } from '../index';
+import type { LogFunction, LogLevels, LogOptions, Postprocessor, Preprocessor } from '../index';
 
 // Test basic import and usage
 const logger: LogFunction = makeLog();
@@ -19,11 +19,52 @@ const customLogger: LogFunction = makeLog({
     error: (...args: any[]) => console.error('[ERROR]', ...args),
   },
   presets: {
-    custom: {
-      level: 'all'
-    }
+    custom: levels.all
   }
 });
+
+const customPreprocessor: Preprocessor = ({ args, levelName }) => [
+  levelName,
+  ...args
+];
+const customPostprocessor: Postprocessor = ({ message, levelName }) => {
+  return `[${levelName}] ${message}`;
+};
+
+const processorLogger: LogFunction = makeLog({
+  level: 'all',
+  preprocessors: [
+    customPreprocessor,
+    preprocessors.addContext({
+      context: { requestId: 'req-1' }
+    }),
+    preprocessors.filter({
+      predicate: ({ arg }) => arg !== undefined
+    }),
+    preprocessors.map({
+      transform: ({ arg }) => typeof arg === 'string' ? arg.toUpperCase() : arg
+    })
+  ],
+  postprocessors: [
+    customPostprocessor,
+    postprocessors.level(),
+    postprocessors.timestamp({
+      format: 'iso',
+      now: () => new Date()
+    }),
+    postprocessors.pid({
+      getPid: () => 123
+    }),
+    postprocessors.prefix({
+      text: '[app]'
+    }),
+    postprocessors.suffix({
+      text: '(done)'
+    })
+  ]
+});
+
+processorLogger.info('processor message');
 
 // Test level property
 const currentLevel: number = customLogger.level;
