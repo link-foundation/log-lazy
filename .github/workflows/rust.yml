@@ -48,6 +48,7 @@ jobs:
   version-check:
     name: Check Crate Version
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [detect-changes]
     if: |
       github.event_name == 'push' ||
@@ -68,6 +69,9 @@ jobs:
 
       - name: Install rust-script
         run: cargo install rust-script
+
+      - name: Test publishing scripts
+        run: python3 experiments/test-rust-publishing.py
 
       - name: Check crate version
         id: check
@@ -307,12 +311,16 @@ jobs:
         id: prm_auth
         # Trusted publishing first; the publish step falls back to the token secret.
         continue-on-error: true
+
       - name: Publish to Crates.io
         id: publish
-        run: rust-script scripts/publish-crate.rs
-
+        run: |
+          echo "Publishing authentication: $PUBLISH_AUTH_METHOD"
+          rust-script scripts/publish-crate.rs
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.prm_auth.outputs.token || secrets.CARGO_REGISTRY_TOKEN || secrets.CARGO_TOKEN }}
+          PUBLISH_AUTH_METHOD: ${{ steps.prm_auth.outputs.token && 'OIDC' || (secrets.CARGO_REGISTRY_TOKEN || secrets.CARGO_TOKEN) && 'token fallback' || 'unconfigured' }}
+
       - name: Create GitHub release
         if: steps.publish.outputs.publish_result == 'success'
         env:
