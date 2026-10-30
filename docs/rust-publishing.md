@@ -27,6 +27,8 @@ and workspace lockfile so the migration can release after merge.
 Run `python3 experiments/test-rust-publishing.py` from the repository root. It
 compiles the release scripts and supplies mock `curl` and `cargo` executables;
 no package is uploaded. The version-check CI job runs this suite too.
+Check the live PR checks for the final commit's GitHub Actions results; the PR
+description records the verified run links.
 
 The regression reproducer showed six failures before the fix: HTTP 403, 429,
 500, 000, malformed output, and a failed curl process all incorrectly allowed
@@ -79,6 +81,5 @@ no legacy secrets have been removed.
 - [x] Reproduce and fix the registry-error version gate; prepare the next version.
 - [x] Preserve OIDC-first authentication and both token fallback names.
 - [x] Add automated regression checks and run local package/runtime checks.
-- [ ] Verify the final commit's GitHub Actions checks.
 - [ ] Register/confirm the crates.io trusted publisher using authenticated setup.
 - [ ] Verify an actual OIDC release from `main` after merge.
