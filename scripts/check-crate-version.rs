@@ -25,9 +25,21 @@ fn set_output(name: &str, value: &str) {
 fn crates_io_status(crate_name: &str, version: &str) -> Option<u16> {
     let url = format!("https://crates.io/api/v1/crates/{crate_name}/{version}");
     let output = Command::new("curl")
-        .args(["-sS", "-o", "/dev/null", "-w", "%{http_code}", &url])
+        .args([
+            "-sS",
+            "--user-agent",
+            "log-lazy-release-check (https://github.com/link-foundation/log-lazy)",
+            "-o",
+            "/dev/null",
+            "-w",
+            "%{http_code}",
+            &url,
+        ])
         .output()
         .ok()?;
+    if !output.status.success() {
+        return None;
+    }
     String::from_utf8_lossy(&output.stdout)
         .trim()
         .parse::<u16>()
@@ -45,7 +57,14 @@ fn main() {
         exit(1);
     });
 
-    let status = crates_io_status(&package.name, &package.version).unwrap_or(0);
+    let status = crates_io_status(&package.name, &package.version).unwrap_or_else(|| {
+        eprintln!("::error::Could not query crates.io; refusing to infer version availability.");
+        exit(1);
+    });
+    if status != 200 && status != 404 {
+        eprintln!("::error::Unexpected crates.io HTTP status {status}; expected 200 or 404.");
+        exit(1);
+    }
     let published = status == 200;
 
     println!("Crate: {}", package.name);
